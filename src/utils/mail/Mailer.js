@@ -44,7 +44,7 @@ class Email {
     async sendMail(mailOptions) {
         try {
             const mailDetails = {
-                from: mailOptions.from || '"' + process.env.MAIL_FROM_NAME + '" <' + process.env.MAIL_FROM_ADDRESS + '>',
+                from: (mailOptions.from) ? '"' + process.env.MAIL_FROM_NAME + '" <' + mailOptions.from + '>' : '"' + process.env.MAIL_FROM_NAME + '" <' + process.env.MAIL_FROM_ADDRESS + '>',
                 to: mailOptions.to,
                 subject: mailOptions.subject,
                 text: mailOptions.text,
