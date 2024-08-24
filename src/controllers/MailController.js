@@ -23,6 +23,7 @@ class MailController {
     static async sendEmail(req, res) {
         try {
             const to = req.body.to; // Get the recipient's email address from the request body
+            const from = req.body.to; // Get the sender's email address from the request body
 
             // Prepare the email template data from the request body
             const templateData = {
@@ -32,7 +33,7 @@ class MailController {
                 subject: req.body.subject,
             };
             const email = new Email(); // Create a new instance of the Email utility
-            await email.sendEmailTemplate(3, templateData, to); // Send the email using the specified template and data
+            await email.sendEmailTemplate(3, templateData, to, from); // Send the email using the specified template and data
             res.status(200).json({ message: 'Email sent successfully!' }); // Send a success response
         } catch (error) {
             const logger = new Logger(); // Create a new instance of the Logger utility
