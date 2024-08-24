@@ -23,7 +23,7 @@ class MailController {
     static async sendEmail(req, res) {
         try {
             const to = req.body.to; // Get the recipient's email address from the request body
-            const from = req.body.to; // Get the sender's email address from the request body
+            const from = req.body.from; // Get the sender's email address from the request body
 
             // Prepare the email template data from the request body
             const templateData = {
