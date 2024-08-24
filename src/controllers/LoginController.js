@@ -98,7 +98,7 @@ class LoginController {
 
             // Query user information from the database
             const user = await db.table(tables.TBL_USERS)
-                .select("userId", "userPassword", "userEmail", "userPhoneNumber")
+                .select("userId", "userPassword", "userEmail", "userPhoneNumber", "userLogin")
                 .where("userLogin", inputData.username)
                 .first();
 
