@@ -1,5 +1,6 @@
 require('dotenv').config();
 const { getUserByToken } = require('../utils/functions');
+const Logger = require('../utils/logs/Logger'); // Import the Logger utility for logging
 
 const authMiddleware = async (req, res, next) => {
     const authHeader = req.headers.authorization;
@@ -20,8 +21,9 @@ const authMiddleware = async (req, res, next) => {
         req.user = user;
         next();
     } catch (error) {
-        console.error('Error in authMiddleware:', error);
-        res.status(500).json({ message: 'Internal Server Error' });
+        const logger = new Logger(); // Create a new instance of the Logger utility
+        logger.write("Middleware Error: " + error, "middleware/error"); // Log the smsent
+        res.status(500).json({ message: 'Opps! Something went wrong' });
     }
 };
 
