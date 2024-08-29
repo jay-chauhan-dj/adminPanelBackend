@@ -4,6 +4,7 @@ const MailController = require('../../controllers/MailController');
 
 // Mail routes
 router.post("/sendEmail", MailController.sendEmail);
+router.post("/sendQuickReply", MailController.sendQuickReply);
 router.post("/fetchEmails", MailController.fetchEmails);
 router.get("/getEmails", MailController.getEmails);
 router.post("/markRead", MailController.markRead);

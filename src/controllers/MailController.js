@@ -42,6 +42,25 @@ class MailController {
         }
     }
 
+    static async sendQuickReply(req, res) {
+        try {
+            const to = req.body.to; // Get the recipient's email address from the request body
+            const from = req.body.from; // Get the sender's email address from the request body
+
+            // Prepare the email template data from the request body
+            const templateData = {
+                name: req.body.name,
+            };
+            const email = new Email(); // Create a new instance of the Email utility
+            await email.sendEmailTemplate(4, templateData, to, from); // Send the email using the specified template and data
+            res.status(200).json({ message: 'Email sent successfully!' }); // Send a success response
+        } catch (error) {
+            const logger = new Logger(); // Create a new instance of the Logger utility
+            logger.write("Error in sending email: " + error, "email/error"); // Log the error
+            res.status(500).json({ message: 'Oops! Something went wrong!' }); // Send an error response
+        }
+    }
+
     /**
      * @function fetchEmails
      * @description Fetches emails using the ImapClient utility and inserts them into the database.
