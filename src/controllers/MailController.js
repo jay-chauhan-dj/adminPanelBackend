@@ -111,6 +111,7 @@ class MailController {
 
             const emails = await db.table(tables.TBL_MAILS)
                 .select("*")
+                .orderBy("mailDate", "DESC")
                 .get(); // Fetch all email records from the database
 
             res.status(200).json(MailController.formatMailData(emails)); // Send the email data as a JSON response

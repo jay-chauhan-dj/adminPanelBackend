@@ -219,7 +219,7 @@ class MoneyController {
             // Query to fetch the most recent 5 transactions from the database
             const transections = await db.table(tables.TBL_TRANSECTIONS)
                 .select("transectionAmount", "transectionType", "transectionTitle", "transectionTime")
-                .orderBy("transectionTitle", "DESC")
+                .orderBy("transectionTime", "DESC")
                 .limit(5)
                 .get();
 
