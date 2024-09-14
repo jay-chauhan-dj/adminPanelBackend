@@ -1,3 +1,5 @@
+const Logger = require('../utils/logs/Logger'); // Import the Logger utility for logging
+
 const express = require('express');
 const cors = require('cors');
 
