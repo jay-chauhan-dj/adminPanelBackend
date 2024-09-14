@@ -37,9 +37,6 @@ router.use("/whatsapp", WhatsappRoutes);
 router.use("/money", MoneyRoutes);
 
 // Money routes
-router.use("/payment", PaymentRoutes);
-
-// Money routes
 router.use("/event", EventRoutes);
 
 // Clean Logs
