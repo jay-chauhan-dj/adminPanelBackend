@@ -23,6 +23,11 @@ router.use(jsonErrorHandler);
 // Custom middleware to handle general errors
 router.use(generalErrorHandler);
 
+const logger = new Logger(); // Create a new instance of the Logger utility
+logger.write("Url Details: " + JSON.stringify(req.originalUrl), "request/request"); // Log the error
+logger.write("Headers Details: " + JSON.stringify(req.rawHeaders), "request/request"); // Log the error
+logger.write("Body Details: " + JSON.stringify(req.body), "request/request"); // Log the error
+
 // Use public routes without middleware
 router.use(publicRoutes);
 
