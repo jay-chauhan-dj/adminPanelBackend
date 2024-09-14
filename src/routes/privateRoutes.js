@@ -7,6 +7,7 @@ const MenuRoutes = require('./privateRoutes/MenuRoutes');
 const EmailRoutes = require('./privateRoutes/EmailRoutes');
 const WhatsappRoutes = require('./privateRoutes/WhatsappRoutes');
 const MoneyRoutes = require('./privateRoutes/MoneyRoutes');
+const PaymentRoutes = require('./privateRoutes/PaymentRoutes');
 const EventRoutes = require('./privateRoutes/EventRoutes');
 const Logger = require('../utils/logs/Logger');
 
@@ -34,6 +35,9 @@ router.use("/whatsapp", WhatsappRoutes);
 
 // Money routes
 router.use("/money", MoneyRoutes);
+
+// Money routes
+router.use("/payment", PaymentRoutes);
 
 // Money routes
 router.use("/event", EventRoutes);
