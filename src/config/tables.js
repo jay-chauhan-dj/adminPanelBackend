@@ -21,6 +21,7 @@ const tables = {
     TBL_VISITORS: "tblVisitors",
     TBL_WHATSAPP_CLIENTS: "tblWhatsappClients",
     TBL_WHATSAPP_TEMPLATES: "tblWhatsappTemplates",
+    TBL_WHATSAPP_MESSAGES: "tblWhatsappMessages",
     TBL_EVENTS: "tblEvents"
 };
 

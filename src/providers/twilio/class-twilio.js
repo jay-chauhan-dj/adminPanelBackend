@@ -5,7 +5,6 @@ const tables = require('../../config/tables');  // Import tables configuration
 
 /**
  * Twilio class handles all WhatsApp operations through Twilio API
- * @author Jay Chauhan
  * @class
  */
 class Twilio {
@@ -18,16 +17,9 @@ class Twilio {
         this.client = null;  // Twilio client for API operations, initialized later
     }
 
-    /**
-     * Private method to set up Twilio credentials by fetching from the database
-     * @private
-     * @async
-     * @returns {Promise<boolean>} - Returns true if setup is successful, false otherwise
-     */
     async #setup() {
         try {
             await this.db.connect();
-
             const twilioCredentials = await this.db.table(tables.TBL_WHATSAPP_CLIENTS)
                 .select('clientAccountId', 'clientApiKey', 'clientWhatsppNumber')
                 .where('clientName', 'Twilio')
@@ -39,27 +31,20 @@ class Twilio {
                 this.authToken = twilioCredentials.clientApiKey;
                 this.twilioNumber = "+91" + twilioCredentials.clientWhatsppNumber;
                 this.client = twilio(this.accountSid, this.authToken);
-                return true;  // Setup successful
+                return true;
             } else {
                 this.logger.error('Twilio credentials not found in the database', 'twilio/error');
-                return false;  // Setup failed
+                return false;
             }
         } catch (error) {
             this.logger.write("Something went wrong in setup: " + error, "twilio/error");
-            return false;  // Setup failed
+            return false;
         }
     }
 
-    /**
-     * Method to create a WhatsApp message template using Twilio Content Template Builder
-     * @param {string} templateName - Name of the template
-     * @param {string} body - Template body
-     * @param {Object} variables - Variables to be included in the template
-     * @returns {Promise<Object>} - The response from Twilio API
-     */
     async createTemplate(templateName, body, variables) {
-        const setupSuccess = await this.#setup();  // Call setup to initialize Twilio client
-        if (!setupSuccess) return;  // Exit if setup failed
+        const setupSuccess = await this.#setup();
+        if (!setupSuccess) return;
 
         try {
             const response = await this.client.content.templates.create({
@@ -75,14 +60,9 @@ class Twilio {
         }
     }
 
-    /**
-     * Method to get the status of an existing WhatsApp template
-     * @param {string} templateSid - The SID of the template
-     * @returns {Promise<Object>} - The template status
-     */
     async getTemplateStatus(templateSid) {
-        const setupSuccess = await this.#setup();  // Call setup to initialize Twilio client
-        if (!setupSuccess) return;  // Exit if setup failed
+        const setupSuccess = await this.#setup();
+        if (!setupSuccess) return;
 
         try {
             const response = await this.client.content.templates(templateSid).fetch();
@@ -94,17 +74,9 @@ class Twilio {
         }
     }
 
-    /**
-     * Method to send a WhatsApp template message
-     * @param {string} to - Recipient's WhatsApp number
-     * @param {string} templateSid - The SID of the template
-     * @param {Object} templateParams - Template parameters (values for placeholders)
-     * @returns {Promise<Object>} - The message response from Twilio API
-     */
     async sendTemplateMessage(to, templateSid, templateParams) {
-        console.log([to, templateSid, templateParams]);
-        const setupSuccess = await this.#setup();  // Call setup to initialize Twilio client
-        if (!setupSuccess) return;  // Exit if setup failed
+        const setupSuccess = await this.#setup();
+        if (!setupSuccess) return;
 
         try {
             const message = await this.client.messages.create({
@@ -121,22 +93,16 @@ class Twilio {
         }
     }
 
-    /**
-     * Method to receive incoming WhatsApp messages using a Twilio webhook and insert them into the database
-     * @param {Object} req - Express.js request object (containing the incoming message)
-     * @returns {Promise<Object>} - The received message data
-     */
     async receiveMessage(data) {
-        const setupSuccess = await this.#setup();  // Call setup to initialize Twilio client
-        if (!setupSuccess) return;  // Exit if setup failed
+        const setupSuccess = await this.#setup();
+        if (!setupSuccess) return;
 
         try {
-            const message = data.Body;  // Extract the incoming message body
-            const from = data.From;  // Extract the sender's number
+            const message = data.Body;
+            const from = data.From;
 
             this.logger.write(`Received WhatsApp message from ${from}: ${message}`, 'twilio/incoming');
 
-            // Insert received message into the database
             await this.db.table(tables.TBL_RECEIVED_MESSAGES)
                 .insert({
                     sender: from,
@@ -152,13 +118,9 @@ class Twilio {
         }
     }
 
-    /**
-     * Method to fetch all created templates from Twilio and insert them into the database
-     * @returns {Promise<Array>} - List of templates
-     */
     async getAllTemplates() {
-        const setupSuccess = await this.#setup();  // Call setup to initialize Twilio client
-        if (!setupSuccess) return;  // Exit if setup failed
+        const setupSuccess = await this.#setup();
+        if (!setupSuccess) return;
 
         try {
             const templates = await this.client.content.templates.list();
@@ -178,6 +140,38 @@ class Twilio {
             return templates;
         } catch (error) {
             this.logger.write("Error fetching and inserting templates: " + error, "twilio/error");
+            throw error;
+        }
+    }
+
+    /**
+     * Method to send a freeform WhatsApp message
+     * @param {string} to - Recipient's WhatsApp number
+     * @param {string} message - The message body to be sent
+     * @param {string} [mediaUrl] - Optional URL of media to send (image, video, etc.)
+     * @returns {Promise<Object>} - The message response from Twilio API
+     */
+    async sendFreeformMessage(to, message, mediaUrl = null) {
+        const setupSuccess = await this.#setup();
+        if (!setupSuccess) return;
+
+        try {
+            const messageOptions = {
+                from: `whatsapp:${this.twilioNumber}`,
+                to: `whatsapp:+${to}`,
+                body: message,
+            };
+
+            // Include media URL if provided
+            if (mediaUrl) {
+                messageOptions.mediaUrl = [mediaUrl];
+            }
+
+            const response = await this.client.messages.create(messageOptions);
+            this.logger.write(`Freeform message sent to ${to}`, 'twilio/success');
+            return response;
+        } catch (error) {
+            this.logger.write(`Error sending freeform message to ${to}: ${error}`, 'twilio/error');
             throw error;
         }
     }
