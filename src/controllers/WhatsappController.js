@@ -54,7 +54,7 @@ class WhatsappController {
         res.status(200).json({ message: 'Whatsapp sent successfully!', response: response }); // Send a success response with the Whatsapp service response
     }
 
-    static async sendFreeMessage() {
+    static async sendFreeMessage(req, res) {
         const whatsapp = new WhatsappService();
         const response = await whatsapp.sendtemplateMessage('919664788574', '1', ['Jay Chauhan']);
         res.status(200).json({ message: 'Whatsapp sent successfully!', response: response }); // Send a success response with the Whatsapp service response
