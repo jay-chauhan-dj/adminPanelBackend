@@ -60,15 +60,15 @@ class WhatsappService {
                     await this.db.disconnect();
                     return true;
                 } else {
-                    this.logger.error(`Failed to send WhatsApp message to ${to}: ${error}\nvariable count mismatch!`, 'whatsapp/error');
+                    this.logger.write(`Failed to send WhatsApp message to ${to}: ${error}\nvariable count mismatch!`, 'whatsapp/error');
                     return false;
                 }
             } else {
-                this.logger.logger.error(`Template not found for ID: ${templateId}`, 'whatsapp/error');
+                this.logger.logger.write(`Template not found for ID: ${templateId}`, 'whatsapp/error');
                 return false;
             }
         } catch (error) {
-            this.logger.error(`Failed to send WhatsApp message to ${to}: ${error}`, 'whatsapp/error');
+            this.logger.write(`Failed to send WhatsApp message to ${to}: ${error}`, 'whatsapp/error');
         }
     }
 }
