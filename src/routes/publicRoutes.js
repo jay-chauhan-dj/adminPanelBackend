@@ -24,6 +24,6 @@ router.get('/routes', RoutesController.getRoutes);
 router.use("/payment", PaymentRoutes);
 
 // Whatsapp routes
-router.get("/whatsapp/inbound", WhatsappController.getMessage);
+router.post("/whatsapp/inbound", WhatsappController.getMessage);
 
 module.exports = router;
