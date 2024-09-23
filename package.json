@@ -19,6 +19,7 @@
     "mailparser": "^3.7.1",
     "mysql2": "^3.10.3",
     "node-cron": "^3.0.3",
-    "nodemailer": "^6.9.14"
+    "nodemailer": "^6.9.14",
+    "twilio": "^5.3.1"
   }
 }
