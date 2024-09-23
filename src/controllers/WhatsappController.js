@@ -49,7 +49,7 @@ class WhatsappController {
 
     static async sendTemplate(req, res) {
         const twilio = new Twilio();
-        const response = await twilio.sendTemplateMessage('+919664788574', 'HX8e2771b25207d1bb0d5d219058af9f45', { 1: 'Jay Chauhan' });
+        const response = await twilio.sendTemplateMessage('919664788574', 'HX8e2771b25207d1bb0d5d219058af9f45', { 1: 'Jay Chauhan' });
         res.status(200).json({ message: 'Whatsapp sent successfully!', response: response }); // Send a success response with the Whatsapp service response
     }
 
