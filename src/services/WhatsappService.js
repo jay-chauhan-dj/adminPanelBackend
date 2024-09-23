@@ -33,20 +33,21 @@ class WhatsappService {
         }
     }
 
-    async sendtemplateMessage(to, templateId, templateParams) {
+    async sendTemplateMessage(to, templateId, templateParams) {
         try {
             await this.db.connect();
             const templateData = await this.db.table(tables.TBL_WHATSAPP_TEMPLATES).select('templateWhatsappClientIdentifier as templateSid', 'templateVariableCount as paramCount').where('templateId', templateId).where('templateIsActive', '1').first();
             await this.db.disconnect();
 
             if (templateData) {
-                if (templateParams.length == templateData.templateParams) {
+                if (templateParams.length == templateData.paramCount) {
                     let templateVariables = {};
                     let i = 1;
                     templateParams.forEach(element => {
                         templateVariables[i] = element;
                         i++;
                     });
+
                     const response = await this.twilio.sendTemplateMessage(to, templateData.templateSid, templateVariables);
                     const messageDetails = {
                         whatsappMessageId: response.sid,
