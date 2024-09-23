@@ -1,7 +1,7 @@
 const Twilio = require('../providers/twilio/class-twilio');  // Import Logger class for logging
-const Logger = require('../../utils/logs/Logger');  // Import Logger class for logging
-const MySQL = require('../../utils/db/Mysql');  // Import Mysql class for database operations
-const tables = require('../../config/tables');  // Import tables configuration
+const Logger = require('../utils/logs/Logger');  // Import Logger class for logging
+const MySQL = require('../utils/db/Mysql');  // Import Mysql class for database operations
+const tables = require('../config/tables');  // Import tables configuration
 
 /**
  * WhatsappService class handles all WhatsApp operations through Twilio API
