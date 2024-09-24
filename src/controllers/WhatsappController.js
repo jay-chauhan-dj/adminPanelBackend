@@ -103,7 +103,7 @@ class WhatsappController {
     static async getWhatsappMessages(req, res) {
         try {
             const whatsapp = new WhatsappService();
-            const response = await whatsapp.getWhstappMessages();
+            const response = await whatsapp.getWhatsappMessages();
 
             if (response) {
                 res.status(200).json(response);

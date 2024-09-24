@@ -183,7 +183,7 @@ class WhatsappService {
     * @method getWhstappMessages
     * @description Fetches Whstapp data from the database and sends it as a JSON response.
     */
-    async getWhstappMessages() {
+    async getWhatsappMessages() {
         try {
             await this.db.connect(); // Connect to the database
             const whatsappMessages = await this.db.table(tables.TBL_WHATSAPP_MESSAGES).select("*").get(); // Fetch whatsapp messages from the specified table
@@ -210,7 +210,7 @@ class WhatsappService {
         const users = {}; // Initialize an empty object to store user messages
 
         data.forEach(item => {
-            const { messageFrom, messageTo, messageBody, messageTime } = item; // Destructure the whatsapp messages item
+            const { messageFrom, messageTo, messageBody, messageTime, messageType } = item; // Destructure the whatsapp messages item
             const dateKey = this.#formatDate(messageTime); // Format the date
 
             // Process sender information
@@ -233,8 +233,8 @@ class WhatsappService {
 
             // Add message to the sender's messages
             users[messageFrom].messages[dateKey].push({
-                fromUserId: messageFrom,
-                toUserId: messageTo,
+                fromUserId: ((!messageType) ? (messageFrom) : (messageTo)),
+                toUserId: ((messageType) ? (messageFrom) : (messageTo)),
                 text: this.#convertToHTML(messageBody),
                 time: this.#formatTime(messageTime)
             });
@@ -259,8 +259,8 @@ class WhatsappService {
 
             // Add message to the receiver's messages
             users[messageTo].messages[dateKey].push({
-                fromUserId: messageFrom,
-                toUserId: messageTo,
+                fromUserId: ((!messageType) ? (messageFrom) : (messageTo)),
+                toUserId: ((messageType) ? (messageFrom) : (messageTo)),
                 text: this.#convertToHTML(messageBody),
                 time: this.#formatTime(messageTime)
             });
