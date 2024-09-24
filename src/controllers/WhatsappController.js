@@ -75,7 +75,7 @@ class WhatsappController {
             const whatsapp = new WhatsappService();
             const response = await whatsapp.sendMessage(req.body.to, req.body.message);
 
-            res.status(200).json({ message: 'Whatsapp sent successfully!', response: response }); // Send a success response with the Whatsapp service response
+            res.status(200).json({ message: 'Whatsapp sent successfully!', status: 'success' }); // Send a success response with the Whatsapp service response
         } catch (error) {
             const logger = new Logger(); // Create a new instance of the Logger utility
             logger.write("Error in sending Whatsapp message: " + error, "whatsapp/error"); // Log the error
