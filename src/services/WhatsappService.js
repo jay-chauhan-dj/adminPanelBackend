@@ -45,10 +45,10 @@ class WhatsappService {
             await this.db.disconnect();
 
             // Log successful message sending
-            this.logger.info(`WhatsApp message sent to ${to}: ${body}`, 'whatsapp/message');
+            this.logger.write(`WhatsApp message sent to ${to}: ${body}`, 'whatsapp/message');
         } catch (error) {
             // Log error if message sending fails
-            this.logger.error(`Failed to send WhatsApp message to ${to}: ${error}`, 'whatsapp/error');
+            this.logger.write(`Failed to send WhatsApp message to ${to}: ${error}`, 'whatsapp/error');
         }
     }
 
