@@ -71,11 +71,16 @@ class WhatsappController {
     }
 
     static async sendFreeMessage(req, res) {
-        const whatsapp = new WhatsappService();
-        const response = await whatsapp.sendTemplateMessage('919664788574', '1', ['Jay Chauhan']);
-        console.log(response);
+        try {
+            const whatsapp = new WhatsappService();
+            const response = await whatsapp.sendMessage(req.body.to, req.body.message);
 
-        res.status(200).json({ message: 'Whatsapp sent successfully!', response: response }); // Send a success response with the Whatsapp service response
+            res.status(200).json({ message: 'Whatsapp sent successfully!', response: response }); // Send a success response with the Whatsapp service response
+        } catch (error) {
+            const logger = new Logger(); // Create a new instance of the Logger utility
+            logger.write("Error in sending Whatsapp message: " + error, "whatsapp/error"); // Log the error
+            res.status(500).json({ message: 'Oops! Something went wrong!' }); // Send an error response
+        }
     }
 
     static async getMessage(req, res) {
@@ -85,6 +90,23 @@ class WhatsappController {
 
             if (response) {
                 res.status(200).json({ message: 'Whatsapp message saved successfully!' });
+            } else {
+                res.status(500).json({ message: 'Whatsapp messaeg not saved successfully!' });
+            }
+        } catch (error) {
+            const logger = new Logger(); // Create a new instance of the Logger utility
+            logger.write("Error in storing Whatsapp message: " + error, "whatsapp/error"); // Log the error
+            res.status(500).json({ message: 'Oops! Something went wrong!' }); // Send an error response
+        }
+    }
+
+    static async getWhatsappMessages(req, res) {
+        try {
+            const whatsapp = new WhatsappService();
+            const response = await whatsapp.getWhstappMessages();
+
+            if (response) {
+                res.status(200).json(response);
             } else {
                 res.status(500).json({ message: 'Whatsapp messaeg not saved successfully!' });
             }

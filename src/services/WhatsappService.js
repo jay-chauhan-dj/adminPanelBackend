@@ -28,14 +28,14 @@ class WhatsappService {
     async sendMessage(to, body) {
         try {
             // Send freeform message using Twilio API
-            const response = await this.twilio.sendFreeformMessage(to, body);
+            const response = await this.twilio.sendFreeformMessage(to, this.#convertToWhatsappFormate(body));
 
             // Prepare message details for database insertion
             const messageDetails = {
                 whatsappMessageId: response.sid,  // Unique message ID from Twilio
                 messageFrom: response.from.split(':')[1],  // Extract sender number from Twilio response
                 messageTo: response.to.split(':')[1],  // Extract recipient number from Twilio response
-                messageBody: response.body,  // Message content
+                messageBody: this.#convertToWhatsappFormate(response.body),  // Message content
                 messageType: "0",  // Message type (0 indicates freeform message)
             };
 
@@ -144,7 +144,6 @@ class WhatsappService {
         }
     }
 
-
     /**
      * Saves the details of a received WhatsApp message into the database.
      * Extracts relevant information from the message data and stores it in the database.
@@ -179,6 +178,180 @@ class WhatsappService {
         }
     }
 
+    /**
+    * @static
+    * @method getWhstappMessages
+    * @description Fetches Whstapp data from the database and sends it as a JSON response.
+    */
+    async getWhstappMessages() {
+        try {
+            await this.db.connect(); // Connect to the database
+            const whatsappMessages = await this.db.table(tables.TBL_WHATSAPP_MESSAGES).select("*").get(); // Fetch whatsapp messages from the specified table
+            await this.db.disconnect(); // Disconnect from the database
+            const userMessage = this.#generateWhatsappJson(whatsappMessages); // Generate JSON object from the whatsapp messages
+
+            return userMessage; // Return whatsapp messages data
+        } catch (error) {
+            const logger = new Logger(); // Create a new instance of the Logger utility
+            logger.write("Error in getting sms: " + error, "sms/error"); // Log the error
+            return false;
+        }
+    }
+
+    /**
+     * @static
+     * @private
+     * @method #generateSmsJson
+     * @description Generates a structured JSON object from the whatsapp messages.
+     * @param {Array} data - Array of whatsapp messages objects
+     * @returns {Array} - Array of user message objects
+     */
+    #generateWhatsappJson(data) {
+        const users = {}; // Initialize an empty object to store user messages
+
+        data.forEach(item => {
+            const { messageFrom, messageTo, messageBody, messageTime } = item; // Destructure the whatsapp messages item
+            const dateKey = this.#formatDate(messageTime); // Format the date
+
+            // Process sender information
+            if (!users[messageFrom]) {
+                users[messageFrom] = {
+                    userId: messageFrom,
+                    name: messageFrom,
+                    path: '/assets/images/auth/user.png',
+                    time: this.#formatTime(messageTime),
+                    preview: this.#convertToHTML(this.#generatePreview(messageBody)),
+                    messages: {},
+                    active: true
+                };
+            }
+
+            // Initialize dateKey if not present for the sender
+            if (!users[messageFrom].messages[dateKey]) {
+                users[messageFrom].messages[dateKey] = [];
+            }
+
+            // Add message to the sender's messages
+            users[messageFrom].messages[dateKey].push({
+                fromUserId: messageFrom,
+                toUserId: messageTo,
+                text: this.#convertToHTML(messageBody),
+                time: this.#formatTime(messageTime)
+            });
+
+            // Process receiver information
+            if (!users[messageTo]) {
+                users[messageTo] = {
+                    userId: messageTo,
+                    name: messageTo,
+                    path: '/assets/images/auth/user.png',
+                    time: this.#formatTime(messageTime),
+                    preview: this.#convertToHTML(this.#generatePreview(messageBody)),
+                    messages: {},
+                    active: true
+                };
+            }
+
+            // Initialize dateKey if not present for the receiver
+            if (!users[messageTo].messages[dateKey]) {
+                users[messageTo].messages[dateKey] = [];
+            }
+
+            // Add message to the receiver's messages
+            users[messageTo].messages[dateKey].push({
+                fromUserId: messageFrom,
+                toUserId: messageTo,
+                text: this.#convertToHTML(messageBody),
+                time: this.#formatTime(messageTime)
+            });
+        });
+
+        return Object.values(users); // Return the array of user message objects
+    }
+
+    /**
+     * @static
+     * @private
+     * @method #formatDate
+     * @description Formats a Date object into a string (DD-MMM-YYYY).
+     * @param {Date} date - Date object
+     * @returns {String} - Formatted date string
+     */
+    #formatDate(date) {
+        return date.toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+        });
+    }
+
+    /**
+     * @static
+     * @private
+     * @method #formatTime
+     * @description Formats a Date object into a string (DD-MMM-YYYY, HH:MM AM/PM).
+     * @param {Date} date - Date object
+     * @returns {String} - Formatted time string
+     */
+    #formatTime(date) {
+        return date.toLocaleString('en-GB', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        });
+    }
+
+    /**
+     * @static
+     * @private
+     * @method #generatePreview
+     * @description Generates a preview text from the message body.
+     * @param {String} message - message body
+     * @returns {String} - Preview text
+     */
+    #generatePreview(message) {
+        const lines = message.split('\n').filter(line => line.trim() !== ''); // Split the message into lines and filter out empty lines
+        return lines.slice(0, 2).join('\n') + (lines.length > 2 ? '...' : ''); // Join the first two lines and add '...' if there are more lines
+    }
+
+    #convertToHTML(text) {
+        // Replace *text* with <strong>text</strong>
+        // The regex /\*(.*?)\*/ finds text between single * symbols
+        // and replaces it with <strong> tags around the content.
+        const strongReplaced = text.replace(/\*(.*?)\*/g, '<strong>$1</strong>');
+
+        // Replace _text_ with <em>text</em>
+        // The regex /_(.*?)_/ finds text between single _ symbols
+        // and replaces it with <em> tags around the content.
+        const italicReplaced = strongReplaced.replace(/_(.*?)_/g, '<em>$1</em>');
+
+        // Replace new line characters \n with <br> HTML tags
+        // This handles line breaks by converting them into HTML <br> tags.
+        const newLineReplaced = italicReplaced.replace(/\n/g, '<br>');
+
+        // Return the fully processed HTML string
+        return newLineReplaced;
+    }
+
+    #convertToWhatsappFormate(htmlText) {
+        // Replace <strong>text</strong> with *text*
+        // This regex finds content between <strong> tags and replaces it with *text*.
+        const strongReversed = htmlText.replace(/<strong>(.*?)<\/strong>/g, '*$1*');
+
+        // Replace <em>text</em> with _text_
+        // This regex finds content between <em> tags and replaces it with _text_.
+        const italicReversed = strongReversed.replace(/<em>(.*?)<\/em>/g, '_$1_');
+
+        // Replace <br> with a newline character \n
+        // This handles the <br> HTML tag and converts it back to a newline.
+        const newLineReversed = italicReversed.replace(/<br>/g, '\n');
+
+        // Return the plain text string
+        return newLineReversed;
+    }
 }
 
 // Export the WhatsappService class for use in other modules
