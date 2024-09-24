@@ -49,9 +49,25 @@ class WhatsappController {
     }
 
     static async sendTemplate(req, res) {
-        const twilio = new Twilio();
-        const response = await twilio.sendTemplateMessage('919664788574', 'HX8e2771b25207d1bb0d5d219058af9f45', { 1: 'Jay Chauhan' });
-        res.status(200).json({ message: 'Whatsapp sent successfully!', response: response }); // Send a success response with the Whatsapp service response
+        try {
+            const to = req.body.to;
+            const templateName = req.body.templateName;
+            const templateParams = req.body.templateParams;
+
+            const whatsapp = new WhatsappService();
+            const templateId = whatsapp.getTemplateIdByName(templateName);
+            const response = await whatsapp.sendTemplateMessage(to, templateId, templateParams);
+
+            if (response) {
+                res.status(200).json({ message: 'Whatsapp message sent successfully!' });
+            } else {
+                res.status(500).json({ message: 'Whatsapp messaeg not sent successfully!' });
+            }
+        } catch (error) {
+            const logger = new Logger(); // Create a new instance of the Logger utility
+            logger.write("Error in sending Whatsapp message: " + error, "whatsapp/error"); // Log the error
+            res.status(500).json({ message: 'Oops! Something went wrong!' }); // Send an error response
+        }
     }
 
     static async sendFreeMessage(req, res) {
@@ -63,9 +79,20 @@ class WhatsappController {
     }
 
     static async getMessage(req, res) {
-        const logger = new Logger(); // Create a new instance of the Logger utility
-        logger.write("Got inbound message: " + JSON.stringify(req.body), "whatsapp/get");
-        res.status(200).json({ message: 'Whatsapp sent successfully!' }); // Send a success response with the Whatsapp service response
+        try {
+            const whatsapp = new WhatsappService();
+            const response = await whatsapp.saveReceivedMessage(req.body);
+
+            if (response) {
+                res.status(200).json({ message: 'Whatsapp message saved successfully!' });
+            } else {
+                res.status(500).json({ message: 'Whatsapp messaeg not saved successfully!' });
+            }
+        } catch (error) {
+            const logger = new Logger(); // Create a new instance of the Logger utility
+            logger.write("Error in storing Whatsapp message: " + error, "whatsapp/error"); // Log the error
+            res.status(500).json({ message: 'Oops! Something went wrong!' }); // Send an error response
+        }
     }
 }
 
