@@ -55,7 +55,8 @@ class WhatsappController {
             const templateParams = req.body.templateParams;
 
             const whatsapp = new WhatsappService();
-            const templateId = whatsapp.getTemplateIdByName(templateName);
+
+            const templateId = await whatsapp.getTemplateIdByName(templateName);
             const response = await whatsapp.sendTemplateMessage(to, templateId, templateParams);
 
             if (response) {

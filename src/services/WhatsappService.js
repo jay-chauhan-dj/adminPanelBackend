@@ -75,14 +75,16 @@ class WhatsappService {
             // Check if template data exists
             if (templateData) {
                 // Check if the provided parameters match the expected variable count for the template
-                if (templateParams.length == templateData.paramCount) {
+                if (!templateParams || templateParams.length == templateData.paramCount) {
                     let templateVariables = {};
                     let i = 1;
                     // Populate template variables based on the parameter count
-                    templateParams.forEach(element => {
-                        templateVariables[i] = element;
-                        i++;
-                    });
+                    if (templateParams) {
+                        templateParams.forEach(element => {
+                            templateVariables[i] = element;
+                            i++;
+                        });
+                    }
 
                     // Send the template message using Twilio API
                     const response = await this.twilio.sendTemplateMessage(to, templateData.templateSid, templateVariables);
@@ -129,14 +131,14 @@ class WhatsappService {
         try {
             // Connect to the database and fetch the template ID based on the template name
             await this.db.connect();
-            const templateId = await this.db.table(tables.TBL_WHATSAPP_TEMPLATES)
-                .select('templateId')
-                .where('templateName', name)
-                .where('templateIsActive', '1')
+            const templateData = await this.db.table(tables.TBL_WHATSAPP_TEMPLATES)
+                .select("templateId")
+                .where("templateName", name)
+                .where("templateIsActive", "1")
                 .first();
             await this.db.disconnect();
 
-            return templateId;  // Return the fetched template ID
+            return templateData.templateId;  // Return the fetched template ID
         } catch (error) {
             // Log any error encountered during the process
             this.logger.write(`Failed to fetch template ID for ${name}: ${error}`, 'whatsapp/error');

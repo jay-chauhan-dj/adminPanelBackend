@@ -105,7 +105,7 @@ class DataController {
             const returnData = { other: { percentage: 0 } };
             visitorsOs.forEach(os => {
                 const osKey = os.os.replace(" ", "_").toLowerCase();
-                const percentage = Math.round((os.count / total) * 100 * 100) / 100; // Round to 2 decimal places
+                const percentage = Number((((os.count / total) * 100 * 100) / 100).toFixed(2)); // Round to 2 decimal places
                 switch (osKey) {
                     case "os_x":
                     case "windows":
