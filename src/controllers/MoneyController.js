@@ -234,6 +234,38 @@ class MoneyController {
     }
 
     /**
+     * @function getTransection
+     * @description Fetches the most recent transactions from the database and returns them in the response.
+     * @param {Object} req - Express request object
+     * @param {Object} res - Express response object
+     * @returns {void}
+     */
+    static async getTransection(req, res) {
+        const db = new MySQL(); // Create a new instance of the MySQL utility
+
+        try {
+            await db.connect(); // Connect to the database
+
+            // Query to fetch the most recent 5 transactions from the database
+            const transections = await db.table(tables.TBL_TRANSECTIONS + " t")
+                .join(tables.TBL_PAYMENT_METHODS + " m", "t.transectionPaymentMeyhodId=m.paymentMethodId")
+                .join(tables.TBL_BANK_DETAILS + " b", "b.bankId=m.paymentMethodBankId")
+                .join(tables.TBL_USERS + " u", "u.userId=t.transactionUserId")
+                .select("t.transectionAmount", "t.transectionType", "t.transectionTitle", "t.transectionTime", "m.paymentMethodName", "b.bankName", "CONCAT(u.userFirstName, ' ', u.userLastName) as name")
+                .orderBy("t.transectionTime", "DESC")
+                .get();
+
+            res.status(200).json(transections); // Send the recent transactions as a JSON response
+        } catch (error) {
+            const logger = new Logger(); // Create a new instance of the Logger utility
+            logger.write("Error in fetching recent transection: " + error, "money/error"); // Log the error with a custom message
+            res.status(500).json({ message: 'Oops! Something went wrong!', "success": false }); // Send an error response
+        } finally {
+            await db.disconnect(); // Disconnect from the database
+        }
+    }
+
+    /**
      * @function getBankBalance
      * @description Fetches the total bank balance for active accounts from the database and returns it in the response.
      * @param {Object} req - Express request object
