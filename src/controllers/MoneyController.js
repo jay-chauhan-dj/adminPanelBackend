@@ -251,7 +251,7 @@ class MoneyController {
                 .join(tables.TBL_PAYMENT_METHODS + " m", "t.transectionPaymentMeyhodId=m.paymentMethodId")
                 .join(tables.TBL_BANK_DETAILS + " b", "b.bankId=m.paymentMethodBankId")
                 .join(tables.TBL_USERS + " u", "u.userId=t.transactionUserId")
-                .select("t.transectionId", "t.transectionAmount", "t.transectionType", "t.transectionTitle", "t.transectionTime", "m.paymentMethodName", "b.bankName", "CONCAT(u.userFirstName, ' ', u.userLastName) as name")
+                .select("t.transactionId", "t.transectionAmount", "t.transectionType", "t.transectionTitle", "t.transectionTime", "m.paymentMethodName", "b.bankName", "CONCAT(u.userFirstName, ' ', u.userLastName) as name")
                 .orderBy("t.transectionTime", "DESC")
                 .get();
 
