@@ -3,6 +3,7 @@ const Mail = require('../utils/mail/Mail'); // Import the Mail utility for sendi
 const tables = require('../config/tables'); // Import table configurations
 const crypto = require('crypto'); // Import the crypto module for generating secure OTP and hashes
 const Logger = require('../utils/logs/Logger'); // Import the Logger utility for logging
+const WhatsappService = require('../services/WhatsappService');
 
 /**
  * @class LoginController
@@ -99,7 +100,7 @@ class LoginController {
 
             // Query user information from the database
             const user = await db.table(tables.TBL_USERS)
-                .select("userId", "userPassword", "userEmail", "userPhoneNumber", "userWhatsappNumber", "userLogin")
+                .select("userId", "userPassword", "userEmail", "userPhoneNumber", "userWhatsappNumber", "userLogin", "userFirstName", "userLastName")
                 .where("userLogin", inputData.username)
                 .first();
 
@@ -117,7 +118,7 @@ class LoginController {
                     await email.sendEmailTemplate(1, templateData, user.userEmail);
                     // Whatsapp
                     const templateId = await whatsapp.getTemplateIdByName('login_otp');
-                    await whatsapp.sendTemplateMessage(user.userWhatsappNumber, templateId, [otp]);
+                    await whatsapp.sendTemplateMessage("91" + user.userWhatsappNumber, templateId, [user.userFirstName + " " + user.userLastName, otp]);
 
                     // Insert OTP verification details into the database
                     const otpVerificationData = {
