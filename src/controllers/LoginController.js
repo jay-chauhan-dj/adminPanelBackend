@@ -86,6 +86,7 @@ class LoginController {
     static async sendOtp(req, res) {
         const email = new Mail(); // Create a new instance of the Mail utility
         const db = new MySQL(); // Create a new instance of the MySQL utility
+        const whatsapp = new WhatsappService(); // Create a new instance of the Whatsapp utility
 
         try {
             const inputData = {
@@ -98,7 +99,7 @@ class LoginController {
 
             // Query user information from the database
             const user = await db.table(tables.TBL_USERS)
-                .select("userId", "userPassword", "userEmail", "userPhoneNumber", "userLogin")
+                .select("userId", "userPassword", "userEmail", "userPhoneNumber", "userWhatsappNumber", "userLogin")
                 .where("userLogin", inputData.username)
                 .first();
 
@@ -112,7 +113,11 @@ class LoginController {
                     };
 
                     // Send OTP email
+                    // Mail
                     await email.sendEmailTemplate(1, templateData, user.userEmail);
+                    // Whatsapp
+                    const templateId = await whatsapp.getTemplateIdByName('login_otp');
+                    await whatsapp.sendTemplateMessage(user.userWhatsappNumber, templateId, [otp]);
 
                     // Insert OTP verification details into the database
                     const otpVerificationData = {
