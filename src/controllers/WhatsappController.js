@@ -117,6 +117,29 @@ class WhatsappController {
             res.status(500).json({ message: 'Oops! Something went wrong!' }); // Send an error response
         }
     }
+
+    static async sendTaskNotification(req, res) {
+        try {
+            const to = '919313440532';
+            const templateName = 'add_task_notification';
+            const templateParams = [];
+
+            const whatsapp = new WhatsappService();
+
+            const templateId = await whatsapp.getTemplateIdByName(templateName);
+            const response = await whatsapp.sendTemplateMessage(to, templateId, templateParams);
+
+            if (response) {
+                res.status(200).json({ message: 'Whatsapp message sent successfully!' });
+            } else {
+                res.status(500).json({ message: 'Whatsapp messaeg not sent successfully!' });
+            }
+        } catch (error) {
+            const logger = new Logger(); // Create a new instance of the Logger utility
+            logger.write("Error in sending Whatsapp message: " + error, "whatsapp/error"); // Log the error
+            res.status(500).json({ message: 'Oops! Something went wrong!' }); // Send an error response
+        }
+    }
 }
 
 module.exports = WhatsappController; // Export the WhatsappController class

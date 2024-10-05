@@ -25,5 +25,6 @@ router.use("/payment", PaymentRoutes);
 
 // Whatsapp routes
 router.post("/whatsapp/inbound", WhatsappController.getMessage);
+router.get("/whatsapp/sendTaskNotification", WhatsappController.sendTaskNotification);
 
 module.exports = router;
