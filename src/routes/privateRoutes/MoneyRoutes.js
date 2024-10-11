@@ -11,6 +11,7 @@ router.get("/getRecentTransection", MoneyController.getRecentTransection);
 router.get("/getTransection", MoneyController.getTransection);
 router.get("/getTransectionSummary", MoneyController.getTransectionSummary);
 router.get("/getBankBalance", MoneyController.getBankBalance);
+router.get("/getBankDetails", MoneyController.getBankDetails);
 
 // Export Router
 module.exports = router;

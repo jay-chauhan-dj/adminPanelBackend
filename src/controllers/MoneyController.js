@@ -294,6 +294,36 @@ class MoneyController {
             await db.disconnect(); // Disconnect from the database
         }
     }
+
+    /**
+     * @function getBankDetails
+     * @description Fetches the bank balance details for active accounts from the database and returns it in the response.
+     * @param {Object} req - Express request object
+     * @param {Object} res - Express response object
+     * @returns {void}
+     * @memberof MoneyController
+     */
+    static async getBankDetails(req, res) {
+        const db = new MySQL(); // Create a new instance of the MySQL utility
+
+        try {
+            await db.connect(); // Connect to the database
+
+            // Query to get the total bank balance for active accounts
+            const bankData = await db.table(tables.TBL_BANK_DETAILS)
+                .select("bankName as bank", "bankAccountBalance as balance")
+                .where("bankAccountIsActive", "1")
+                .get();
+
+            res.status(200).json({ bankData: bankData }); // Send the total bank balance as a JSON response
+        } catch (error) {
+            const logger = new Logger(); // Create a new instance of the Logger utility
+            logger.write("Error in getting bank details: " + error, "data/error"); // Log the error with a custom message
+            res.status(500).json({ message: 'Oops! Something went wrong!' }); // Send an error response
+        } finally {
+            await db.disconnect(); // Disconnect from the database
+        }
+    }
 }
 
 module.exports = MoneyController; // Export the MoneyController class
