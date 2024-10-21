@@ -218,37 +218,37 @@ class WhatsappService {
             const { messageFrom, messageTo, messageBody, messageTime, messageType, name } = item; // Destructure the whatsapp messages item
             const dateKey = this.#formatDate(messageTime); // Format the date
 
-            // // Process sender information
-            // if (!users[messageFrom]) {
-            //     users[messageFrom] = {
-            //         userId: messageFrom,
-            //         name: messageFrom,
-            //         path: '/assets/images/auth/user.png',
-            //         time: this.#formatTime(messageTime),
-            //         preview: this.#convertToHTML(this.#generatePreview(messageBody)),
-            //         messages: {},
-            //         active: true
-            //     };
-            // }
+            // Process sender information
+            if (!users[messageFrom]) {
+                users[messageFrom] = {
+                    userId: messageFrom,
+                    name: messageFrom,
+                    path: '/assets/images/auth/user.png',
+                    time: this.#formatTime(messageTime),
+                    preview: this.#convertToHTML(this.#generatePreview(messageBody)),
+                    messages: {},
+                    active: true
+                };
+            }
 
-            // // Initialize dateKey if not present for the sender
-            // if (!users[messageFrom].messages[dateKey]) {
-            //     users[messageFrom].messages[dateKey] = [];
-            // }
+            // Initialize dateKey if not present for the sender
+            if (!users[messageFrom].messages[dateKey]) {
+                users[messageFrom].messages[dateKey] = [];
+            }
 
-            // // Add message to the sender's messages
-            // users[messageFrom].messages[dateKey].push({
-            //     fromUserId: ((!messageType) ? (messageFrom) : (messageTo)),
-            //     toUserId: ((messageType) ? (messageFrom) : (messageTo)),
-            //     text: this.#convertToHTML(messageBody),
-            //     time: this.#formatTime(messageTime)
-            // });
+            // Add message to the sender's messages
+            users[messageFrom].messages[dateKey].push({
+                fromUserId: ((!messageType) ? (messageFrom) : (messageTo)),
+                toUserId: ((messageType) ? (messageFrom) : (messageTo)),
+                text: this.#convertToHTML(messageBody),
+                time: this.#formatTime(messageTime)
+            });
 
             // Process receiver information
             if (!users[messageTo]) {
                 users[messageTo] = {
                     userId: messageTo,
-                    name: name,
+                    name: name || messageTo,
                     path: '/assets/images/auth/user.png',
                     time: this.#formatTime(messageTime),
                     preview: this.#convertToHTML(this.#generatePreview(messageBody)),
