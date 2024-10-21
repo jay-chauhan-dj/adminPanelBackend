@@ -188,7 +188,10 @@ class WhatsappService {
     async getWhatsappMessages() {
         try {
             await this.db.connect(); // Connect to the database
-            const whatsappMessages = await this.db.table(tables.TBL_WHATSAPP_MESSAGES).select("*").get(); // Fetch whatsapp messages from the specified table
+            const whatsappMessages = await this.db.table(tables.TBL_WHATSAPP_MESSAGES + ' m')
+                .join(tables.TBL_CONTACT_INFORMATIONS + ' ci', "CONCAT('+91', ci.contactInformationValue)=m.messageTo")
+                .join(tables.TBL_CONTACTS + ' c', "c.contactId=ci.contactId")
+                .select("m.*", "CONCAT(c.contactFirstName, ' ', c.contactLastName) as name").get(); // Fetch whatsapp messages from the specified table
             await this.db.disconnect(); // Disconnect from the database
             const userMessage = this.#generateWhatsappJson(whatsappMessages); // Generate JSON object from the whatsapp messages
 
@@ -212,14 +215,14 @@ class WhatsappService {
         const users = {}; // Initialize an empty object to store user messages
 
         data.forEach(item => {
-            const { messageFrom, messageTo, messageBody, messageTime, messageType } = item; // Destructure the whatsapp messages item
+            const { messageFrom, messageTo, messageBody, messageTime, messageType, name } = item; // Destructure the whatsapp messages item
             const dateKey = this.#formatDate(messageTime); // Format the date
 
             // Process sender information
             if (!users[messageFrom]) {
                 users[messageFrom] = {
                     userId: messageFrom,
-                    name: messageFrom,
+                    name: name,
                     path: '/assets/images/auth/user.png',
                     time: this.#formatTime(messageTime),
                     preview: this.#convertToHTML(this.#generatePreview(messageBody)),
@@ -245,7 +248,7 @@ class WhatsappService {
             if (!users[messageTo]) {
                 users[messageTo] = {
                     userId: messageTo,
-                    name: messageTo,
+                    name: name,
                     path: '/assets/images/auth/user.png',
                     time: this.#formatTime(messageTime),
                     preview: this.#convertToHTML(this.#generatePreview(messageBody)),

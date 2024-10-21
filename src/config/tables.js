@@ -3,6 +3,7 @@ const tables = {
     TBL_CARD_DETAILS: "tblCardDetails",
     TBL_CONTACT: "tblContact",
     TBL_CONTACTS: "tblContacts",
+    TBL_CONTACT_INFORMATIONS: "tblContactInformations",
     TBL_EMAIL_TEMPLATES: "tblEmailTemplates",
     TBL_EMAILS_DETAILS: "tblEmailsDetails",
     TBL_MAIL_ATTACHMENTS: "tblMailAttachments",
