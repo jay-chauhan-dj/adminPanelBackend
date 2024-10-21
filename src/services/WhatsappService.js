@@ -193,7 +193,7 @@ class WhatsappService {
                 .join(tables.TBL_CONTACTS + ' cTo', "cTo.contactId=ciTo.contactId", 'LEFT')
                 .join(tables.TBL_CONTACT_INFORMATIONS + ' ciFrom', "CONCAT('+91', ciFrom.contactInformationValue)=m.messageFrom OR CONCAT('+', ciFrom.contactInformationValue)=m.messageFrom", 'LEFT')
                 .join(tables.TBL_CONTACTS + ' cFrom', "cFrom.contactId=ciFrom.contactId", 'LEFT')
-                .orderBy('m.messageTime', 'DESC');
+                .orderBy('m.messageTime', 'DESC')
                 .select("m.*", "CONCAT(cTo.contactFirstName, ' ', cTo.contactLastName) as nameTo", "CONCAT(cFrom.contactFirstName, ' ', cFrom.contactLastName) as nameFrom").get(); // Fetch whatsapp messages from the specified table
             await this.db.disconnect(); // Disconnect from the database
             const userMessage = this.#generateWhatsappJson(whatsappMessages); // Generate JSON object from the whatsapp messages
