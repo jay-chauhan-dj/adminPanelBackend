@@ -189,9 +189,11 @@ class WhatsappService {
         try {
             await this.db.connect(); // Connect to the database
             const whatsappMessages = await this.db.table(tables.TBL_WHATSAPP_MESSAGES + ' m')
-                .join(tables.TBL_CONTACT_INFORMATIONS + ' ci', "CONCAT('+91', ci.contactInformationValue)=m.messageTo", 'LEFT')
-                .join(tables.TBL_CONTACTS + ' c', "c.contactId=ci.contactId", 'LEFT')
-                .select("m.*", "CONCAT(c.contactFirstName, ' ', c.contactLastName) as name").get(); // Fetch whatsapp messages from the specified table
+                .join(tables.TBL_CONTACT_INFORMATIONS + ' ci`To', "CONCAT('+91', ciTo.contactInformationValue)=m.messageTo", 'LEFT')
+                .join(tables.TBL_CONTACT_INFORMATIONS + ' ci`From', "CONCAT('+91', ciFrom.contactInformationValue)=m.messageFrom", 'LEFT')
+                .join(tables.TBL_CONTACTS + ' cTo', "cTo.contactId=ciTo.contactId", 'LEFT')
+                .join(tables.TBL_CONTACTS + ' cFrom', "cFrom.contactId=ciFrom.contactId", 'LEFT')
+                .select("m.*", "CONCAT(cTo.contactFirstName, ' ', cTo.contactLastName) as nameTo", "CONCAT(cFrom.contactFirstName, ' ', cFrom.contactLastName) as nameFrom").get(); // Fetch whatsapp messages from the specified table
             await this.db.disconnect(); // Disconnect from the database
             const userMessage = this.#generateWhatsappJson(whatsappMessages); // Generate JSON object from the whatsapp messages
 
@@ -215,14 +217,14 @@ class WhatsappService {
         const users = {}; // Initialize an empty object to store user messages
 
         data.forEach(item => {
-            const { messageFrom, messageTo, messageBody, messageTime, messageType, name } = item; // Destructure the whatsapp messages item
+            const { messageFrom, messageTo, messageBody, messageTime, messageType, nameTo, nameFrom } = item; // Destructure the whatsapp messages item
             const dateKey = this.#formatDate(messageTime); // Format the date
 
             // Process sender information
             if (!users[messageFrom]) {
                 users[messageFrom] = {
                     userId: messageFrom,
-                    name: messageFrom,
+                    name: nameFrom || messageFrom,
                     path: '/assets/images/auth/user.png',
                     time: this.#formatTime(messageTime),
                     preview: this.#convertToHTML(this.#generatePreview(messageBody)),
@@ -248,7 +250,7 @@ class WhatsappService {
             if (!users[messageTo]) {
                 users[messageTo] = {
                     userId: messageTo,
-                    name: name || messageTo,
+                    name: nameTo || messageTo,
                     path: '/assets/images/auth/user.png',
                     time: this.#formatTime(messageTime),
                     preview: this.#convertToHTML(this.#generatePreview(messageBody)),
