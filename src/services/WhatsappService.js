@@ -222,7 +222,7 @@ class WhatsappService {
             if (!users[messageFrom]) {
                 users[messageFrom] = {
                     userId: messageFrom,
-                    name: name,
+                    name: messageFrom,
                     path: '/assets/images/auth/user.png',
                     time: this.#formatTime(messageTime),
                     preview: this.#convertToHTML(this.#generatePreview(messageBody)),
