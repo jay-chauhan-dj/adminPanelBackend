@@ -189,8 +189,8 @@ class WhatsappService {
         try {
             await this.db.connect(); // Connect to the database
             const whatsappMessages = await this.db.table(tables.TBL_WHATSAPP_MESSAGES + ' m')
-                .join(tables.TBL_CONTACT_INFORMATIONS + ' ci', "CONCAT('+91', ci.contactInformationValue)=m.messageTo")
-                .join(tables.TBL_CONTACTS + ' c', "c.contactId=ci.contactId")
+                .join(tables.TBL_CONTACT_INFORMATIONS + ' ci', "CONCAT('+91', ci.contactInformationValue)=m.messageTo", 'LEFT')
+                .join(tables.TBL_CONTACTS + ' c', "c.contactId=ci.contactId", 'LEFT')
                 .select("m.*", "CONCAT(c.contactFirstName, ' ', c.contactLastName) as name").get(); // Fetch whatsapp messages from the specified table
             await this.db.disconnect(); // Disconnect from the database
             const userMessage = this.#generateWhatsappJson(whatsappMessages); // Generate JSON object from the whatsapp messages
@@ -218,31 +218,31 @@ class WhatsappService {
             const { messageFrom, messageTo, messageBody, messageTime, messageType, name } = item; // Destructure the whatsapp messages item
             const dateKey = this.#formatDate(messageTime); // Format the date
 
-            // Process sender information
-            if (!users[messageFrom]) {
-                users[messageFrom] = {
-                    userId: messageFrom,
-                    name: messageFrom,
-                    path: '/assets/images/auth/user.png',
-                    time: this.#formatTime(messageTime),
-                    preview: this.#convertToHTML(this.#generatePreview(messageBody)),
-                    messages: {},
-                    active: true
-                };
-            }
+            // // Process sender information
+            // if (!users[messageFrom]) {
+            //     users[messageFrom] = {
+            //         userId: messageFrom,
+            //         name: messageFrom,
+            //         path: '/assets/images/auth/user.png',
+            //         time: this.#formatTime(messageTime),
+            //         preview: this.#convertToHTML(this.#generatePreview(messageBody)),
+            //         messages: {},
+            //         active: true
+            //     };
+            // }
 
-            // Initialize dateKey if not present for the sender
-            if (!users[messageFrom].messages[dateKey]) {
-                users[messageFrom].messages[dateKey] = [];
-            }
+            // // Initialize dateKey if not present for the sender
+            // if (!users[messageFrom].messages[dateKey]) {
+            //     users[messageFrom].messages[dateKey] = [];
+            // }
 
-            // Add message to the sender's messages
-            users[messageFrom].messages[dateKey].push({
-                fromUserId: ((!messageType) ? (messageFrom) : (messageTo)),
-                toUserId: ((messageType) ? (messageFrom) : (messageTo)),
-                text: this.#convertToHTML(messageBody),
-                time: this.#formatTime(messageTime)
-            });
+            // // Add message to the sender's messages
+            // users[messageFrom].messages[dateKey].push({
+            //     fromUserId: ((!messageType) ? (messageFrom) : (messageTo)),
+            //     toUserId: ((messageType) ? (messageFrom) : (messageTo)),
+            //     text: this.#convertToHTML(messageBody),
+            //     time: this.#formatTime(messageTime)
+            // });
 
             // Process receiver information
             if (!users[messageTo]) {

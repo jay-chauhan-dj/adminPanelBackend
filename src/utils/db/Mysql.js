@@ -80,7 +80,11 @@ class MySQL {
      * @param {string} condition - The join condition.
      * @returns {MySQL}
      */
-    join(table, condition) {
+    join(table, condition, type = null) {
+        if (type) {
+            this.queryParts.joins.push(`${type} JOIN ${table} ON ${condition}`);
+            return this;
+        }
         this.queryParts.joins.push(`JOIN ${table} ON ${condition}`);
         return this;
     }
