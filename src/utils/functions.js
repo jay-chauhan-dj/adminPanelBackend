@@ -37,7 +37,7 @@ const base64Encode = (data) => {
 const date = (format = 'YYYY-MM-DD HH:mm:ss', dateInput = null) => {
     // Create a Date object based on dateInput or use the current date and time
     const now = dateInput ? new Date(dateInput) : new Date();
-    
+
     // Check if the created Date object is valid
     if (isNaN(now.getTime())) {
         throw new Error('Invalid date input');
@@ -108,23 +108,23 @@ const date = (format = 'YYYY-MM-DD HH:mm:ss', dateInput = null) => {
  */
 const convertToPlainText = (formattedText) => {
     const { decode } = require('html-entities');
-    
+
     // Decode HTML entities to plain text
     let text = decode(formattedText);
-    
+
     // Remove markdown-like formatting (e.g., *bold* or _italic_)
     text = text.replace(/\*([^*]+)\*/g, '$1') // Remove asterisks for bold
-               .replace(/_([^_]+)_/g, '$1'); // Remove underscores for italic
-    
+        .replace(/_([^_]+)_/g, '$1'); // Remove underscores for italic
+
     // Replace newlines with spaces
     text = text.replace(/\n+/g, ' ');
-  
+
     // Trim any extra whitespace
     text = text.trim();
-  
+
     return text;
-  }
-  
+}
+
 
 module.exports = {
     getUserByToken,

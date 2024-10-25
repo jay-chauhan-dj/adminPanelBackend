@@ -193,7 +193,7 @@ class WhatsappService {
                 .join(tables.TBL_CONTACTS + ' cTo', "cTo.contactId=ciTo.contactId", 'LEFT')
                 .join(tables.TBL_CONTACT_INFORMATIONS + ' ciFrom', "CONCAT('+91', ciFrom.contactInformationValue)=m.messageFrom OR CONCAT('+', ciFrom.contactInformationValue)=m.messageFrom", 'LEFT')
                 .join(tables.TBL_CONTACTS + ' cFrom', "cFrom.contactId=ciFrom.contactId", 'LEFT')
-                .select("m.*", "CONCAT(cTo.contactFirstName, ' ', cTo.contactLastName) as nameTo", "CONCAT(cFrom.contactFirstName, ' ', cFrom.contactLastName) as nameFrom").get(); // Fetch whatsapp messages from the specified table
+                .select("m.*", "CONCAT(cTo.contactFirstName, ' ', cTo.contactLastName) as nameTo", "CONCAT(cFrom.contactFirstName, ' ', cFrom.contactLastName) as nameFrom", "cFrom.contactImage as imageFrom", "cTo.contactImage as imageTo").get(); // Fetch whatsapp messages from the specified table
             await this.db.disconnect(); // Disconnect from the database
             const userMessage = this.#generateWhatsappJson(whatsappMessages); // Generate JSON object from the whatsapp messages
 
@@ -217,7 +217,7 @@ class WhatsappService {
         const users = {}; // Initialize an empty object to store user messages
 
         data.forEach(item => {
-            const { messageFrom, messageTo, messageBody, messageTime, messageType, nameTo, nameFrom } = item; // Destructure the whatsapp messages item
+            const { messageFrom, messageTo, messageBody, messageTime, messageType, nameTo, nameFrom, imageFrom, imageTo } = item; // Destructure the whatsapp messages item
             const dateKey = this.#formatDate(messageTime); // Format the date
 
             // Process sender information
@@ -225,7 +225,7 @@ class WhatsappService {
                 users[messageFrom] = {
                     userId: messageFrom,
                     name: nameFrom || messageFrom,
-                    path: '/assets/images/auth/user.png',
+                    path: imageFrom,
                     time: this.#formatTime(messageTime),
                     preview: this.#convertToHTML(this.#generatePreview(messageBody)),
                     messages: {},
@@ -251,7 +251,7 @@ class WhatsappService {
                 users[messageTo] = {
                     userId: messageTo,
                     name: nameTo || messageTo,
-                    path: '/assets/images/auth/user.png',
+                    path: imageTo,
                     time: this.#formatTime(messageTime),
                     preview: this.#convertToHTML(this.#generatePreview(messageBody)),
                     messages: {},
