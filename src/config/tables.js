@@ -30,5 +30,4 @@ const tables = {
     TBL_PINCODE: "tblPincode"
 };
 
-// Export the table names as a constant for easy access
 module.exports = tables;
