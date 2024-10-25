@@ -23,7 +23,11 @@ const tables = {
     TBL_WHATSAPP_CLIENTS: "tblWhatsappClients",
     TBL_WHATSAPP_TEMPLATES: "tblWhatsappTemplates",
     TBL_WHATSAPP_MESSAGES: "tblWhatsappMessages",
-    TBL_EVENTS: "tblEvents"
+    TBL_EVENTS: "tblEvents",
+    TBL_COUNTRY: "tblCountry",
+    TBL_STATE: "tblState",
+    TBL_DISTRICT: "tblDistrict",
+    TBL_PINCODE: "tblPincode"
 };
 
 module.exports = tables;
