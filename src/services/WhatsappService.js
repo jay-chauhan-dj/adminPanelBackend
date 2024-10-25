@@ -225,7 +225,7 @@ class WhatsappService {
                 users[messageFrom] = {
                     userId: messageFrom,
                     name: nameFrom || messageFrom,
-                    path: imageFrom,
+                    path: imageFrom || '/assets/images/auth/user.png',
                     time: this.#formatTime(messageTime),
                     preview: this.#convertToHTML(this.#generatePreview(messageBody)),
                     messages: {},
@@ -251,7 +251,7 @@ class WhatsappService {
                 users[messageTo] = {
                     userId: messageTo,
                     name: nameTo || messageTo,
-                    path: imageTo,
+                    path: imageTo || '/assets/images/auth/user.png',
                     time: this.#formatTime(messageTime),
                     preview: this.#convertToHTML(this.#generatePreview(messageBody)),
                     messages: {},
