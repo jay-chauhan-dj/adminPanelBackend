@@ -29,4 +29,5 @@ const tables = {
     TBL_DISTRICT: "tblDistrict",
     TBL_PINCODE: "tblPincode"
 };
+
 module.exports = tables;
