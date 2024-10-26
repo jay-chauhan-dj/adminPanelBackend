@@ -29,6 +29,5 @@ const tables = {
     TBL_DISTRICT: "tblDistrict",
     TBL_PINCODE: "tblPincode"
 };
-
 // Export the table names as a constant for easy access
 module.exports = tables;
