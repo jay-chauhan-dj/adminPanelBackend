@@ -61,7 +61,10 @@ class Event {
                 });
                 eventResponse.push(response.data); // Collect the response
             }
-
+        } catch (error) {
+            const logger = new Logger(); // Create an instance of the Logger utility
+            logger.write("Error handling event [Event Class]: " + error, "event/error"); // Log the error
+        } finally {
             // Prepare data for updating the event status in the database
             const eventUpdateData = {
                 eventStatus: "1", // Update event status to '1' (processed)
@@ -69,10 +72,6 @@ class Event {
                 eventResponseBody: JSON.stringify(eventResponse) // Store the HTTP response body as a JSON string
             };
             await db.table(tables.TBL_EVENTS).where("eventId", this.eventId).update(eventUpdateData);
-        } catch (error) {
-            const logger = new Logger(); // Create an instance of the Logger utility
-            logger.write("Error handling event [Event Class]: " + error, "event/error"); // Log the error
-        } finally {
             await db.disconnect(); // Ensure the database connection is closed
         }
     }
