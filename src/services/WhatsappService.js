@@ -235,8 +235,8 @@ class WhatsappService {
 
             // Add message to the sender's messages
             users[contactNumber].messages[dateKey].push({
-                fromUserId: ((!messageType) ? (contactNumber) : ('919313440532')),
-                toUserId: ((messageType) ? (contactNumber) : ('919313440532')),
+                fromUserId: ((messageType != 0) ? (contactNumber) : ('919313440532')),
+                toUserId: ((messageType == 0) ? (contactNumber) : ('919313440532')),
                 text: this.#convertToHTML(messageBody),
                 time: this.#formatTime(messageTime)
             });
