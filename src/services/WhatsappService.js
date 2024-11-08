@@ -188,6 +188,7 @@ class WhatsappService {
             const whatsappMessages = await this.db.table(tables.TBL_WHATSAPP_MESSAGES + ' m')
                 .join(tables.TBL_CONTACT_INFORMATIONS + ' ci', "ci.contactInformationValue=m.contactNumber", 'LEFT')
                 .join(tables.TBL_CONTACTS + ' c', "c.contactId=ci.contactId", 'LEFT')
+                .orderBy('m.contactNumber', 'ASC')
                 .select("m.*", "CONCAT(c.contactFirstName, ' ', c.contactLastName) as name", "c.contactImage as image").get(); // Fetch whatsapp messages from the specified table
             await this.db.disconnect(); // Disconnect from the database
             const userMessage = this.#generateWhatsappJson(whatsappMessages); // Generate JSON object from the whatsapp messages
