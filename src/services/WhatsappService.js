@@ -33,9 +33,9 @@ class WhatsappService {
             // Prepare message details for database insertion
             const messageDetails = {
                 whatsappMessageId: response.sid,  // Unique message ID from Twilio
-                contactNumber: response.to.split(':')[1],  // Extract recipient number from Twilio response
+                contactNumber: response.to.split(':')[1].replace('+91'),  // Extract recipient number from Twilio response
                 messageBody: this.#convertToWhatsappFormate(response.body),  // Message content
-                messageType: "0",  // Message type (0 indicates freeform message)
+                messageType: "0",  // Message type (0 indicates sent message)
             };
 
             // Connect to the database, insert message details, then disconnect
@@ -92,7 +92,7 @@ class WhatsappService {
                     // Prepare message details for database insertion
                     const messageDetails = {
                         whatsappMessageId: response.sid,  // Unique message ID from Twilio
-                        contactNumber: response.to.split(':')[1],  // Extract recipient number
+                        contactNumber: response.to.split(':')[1].replace('+91'),  // Extract recipient number
                         messageBody: response.body,  // Message content
                         messageType: "0",  // Message type (0 for sent message)
                     };
@@ -156,7 +156,7 @@ class WhatsappService {
                 // Prepare message details for insertion into the database
                 const messageDetails = {
                     whatsappMessageId: data.MessageSid,  // Unique message ID from Twilio, used for tracking
-                    contactNumber: data.From.split(':')[1],  // Extract and clean up sender's phone number (removes 'whatsapp:')
+                    contactNumber: data.From.split(':')[1].replace('+91'),  // Extract and clean up sender's phone number (removes 'whatsapp:')
                     messageBody: data.Body,  // The actual text content of the received message
                     messageType: "1",  // Message type is '1', indicating a received message (as opposed to sent)
                 };
@@ -186,7 +186,7 @@ class WhatsappService {
         try {
             await this.db.connect(); // Connect to the database
             const whatsappMessages = await this.db.table(tables.TBL_WHATSAPP_MESSAGES + ' m')
-                .join(tables.TBL_CONTACT_INFORMATIONS + ' ci', "CONCAT('+91', ci.contactInformationValue)=m.contactNumber OR CONCAT('+', ci.contactInformationValue)=m.contactNumber", 'LEFT')
+                .join(tables.TBL_CONTACT_INFORMATIONS + ' ci', "ci.contactInformationValue=m.contactNumber", 'LEFT')
                 .join(tables.TBL_CONTACTS + ' c', "c.contactId=ci.contactId", 'LEFT')
                 .select("m.*", "CONCAT(c.contactFirstName, ' ', c.contactLastName) as name", "c.contactImage as image").get(); // Fetch whatsapp messages from the specified table
             await this.db.disconnect(); // Disconnect from the database
@@ -240,32 +240,6 @@ class WhatsappService {
                 text: this.#convertToHTML(messageBody),
                 time: this.#formatTime(messageTime)
             });
-
-            // // Process receiver information
-            // if (!users[messageTo]) {
-            //     users[messageTo] = {
-            //         userId: messageTo,
-            //         name: nameTo || messageTo,
-            //         path: imageTo || '/assets/images/auth/user.png',
-            //         time: this.#formatTime(messageTime),
-            //         preview: this.#convertToHTML(this.#generatePreview(messageBody)),
-            //         messages: {},
-            //         active: true
-            //     };
-            // }
-
-            // // Initialize dateKey if not present for the receiver
-            // if (!users[messageTo].messages[dateKey]) {
-            //     users[messageTo].messages[dateKey] = [];
-            // }
-
-            // // Add message to the receiver's messages
-            // users[messageTo].messages[dateKey].push({
-            //     fromUserId: ((!messageType) ? (messageFrom) : (messageTo)),
-            //     toUserId: ((messageType) ? (messageFrom) : (messageTo)),
-            //     text: this.#convertToHTML(messageBody),
-            //     time: this.#formatTime(messageTime)
-            // });
         });
 
         return Object.values(users); // Return the array of user message objects
