@@ -22,7 +22,7 @@ const tables = {
     TBL_VISITORS: "tblVisitors",
     TBL_WHATSAPP_CLIENTS: "tblWhatsappClients",
     TBL_WHATSAPP_TEMPLATES: "tblWhatsappTemplates",
-    TBL_WHATSAPP_MESSAGES: "tblWhatsappMessages",
+    TBL_WHATSAPP_MESSAGES: "tblWhatsappMessagesV2",
     TBL_EVENTS: "tblEvents",
     TBL_COUNTRY: "tblCountry",
     TBL_STATE: "tblState",
