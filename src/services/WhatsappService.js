@@ -217,7 +217,7 @@ class WhatsappService {
 
             // Process sender information
             if (!users[contactNumber]) {
-                users[messagcontactNumbereFrom] = {
+                users[contactNumber] = {
                     userId: contactNumber,
                     name: name || contactNumber,
                     path: image || '/assets/images/auth/user.png',
