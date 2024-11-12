@@ -224,7 +224,7 @@ class Twilio {
             // Prepare message options including media if provided
             const messageOptions = {
                 from: `whatsapp:${this.twilioNumber}`,
-                to: `whatsapp:${to}`,
+                to: `whatsapp:+91${to}`,
                 body: message,
             };
 
