@@ -189,6 +189,7 @@ class WhatsappService {
                 .join(tables.TBL_CONTACT_INFORMATIONS + ' ci', "ci.contactInformationValue=m.contactNumber", 'LEFT')
                 .join(tables.TBL_CONTACTS + ' c', "c.contactId=ci.contactId", 'LEFT')
                 .orderBy('m.contactNumber', 'ASC')
+                .orderBy('m.messageTime', 'ASC')
                 .select("m.*", "CONCAT(c.contactFirstName, ' ', c.contactLastName) as name", "c.contactImage as image").get(); // Fetch whatsapp messages from the specified table
             await this.db.disconnect(); // Disconnect from the database
             const userMessage = this.#generateWhatsappJson(whatsappMessages); // Generate JSON object from the whatsapp messages
@@ -236,8 +237,8 @@ class WhatsappService {
 
             // Add message to the sender's messages
             users[contactNumber].messages[dateKey].push({
-                fromUserId: ((!(messageType == 0)) ? (contactNumber) : ('919313440532')),
-                toUserId: ((!(messageType == 0)) ? ('919313440532') : (contactNumber)),
+                fromUserId: ((messageType == 0) ? (contactNumber) : ('919313190741')),
+                toUserId: ((messageType != 0) ? (contactNumber) : ('919313190741')),
                 text: this.#convertToHTML(messageBody),
                 time: this.#formatTime(messageTime)
             });

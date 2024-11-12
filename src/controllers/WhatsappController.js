@@ -92,7 +92,7 @@ class WhatsappController {
             if (response) {
                 res.status(200).json({ message: 'Whatsapp message saved successfully!' });
             } else {
-                res.status(500).json({ message: 'Whatsapp messaeg not saved successfully!' });
+                res.status(500).json({ message: 'Whatsapp message not saved successfully!' });
             }
         } catch (error) {
             const logger = new Logger(); // Create a new instance of the Logger utility
@@ -109,7 +109,7 @@ class WhatsappController {
             if (response) {
                 res.status(200).json(response);
             } else {
-                res.status(500).json({ message: 'Whatsapp messaeg not saved successfully!' });
+                res.status(500).json({ message: 'Whatsapp message not found!' });
             }
         } catch (error) {
             const logger = new Logger(); // Create a new instance of the Logger utility
