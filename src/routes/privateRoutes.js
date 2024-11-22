@@ -39,6 +39,9 @@ router.use("/money", MoneyRoutes);
 // Money routes
 router.use("/event", EventRoutes);
 
+// Payment routes
+router.use("/payment", PaymentRoutes);
+
 // Clean Logs
 router.post("/clearLogs", (req, res) => {
     const logger = new Logger();

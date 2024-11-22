@@ -27,7 +27,10 @@ const tables = {
     TBL_COUNTRY: "tblCountry",
     TBL_STATE: "tblState",
     TBL_DISTRICT: "tblDistrict",
-    TBL_PINCODE: "tblPincode"
+    TBL_PINCODE: "tblPincode",
+    TBL_PAYMENT_GATEWAY: "tblPaymentGateway",
+    TBL_PAYMENT_LINKS: "tblPaymentLinks",
+    TBL_OPTIONS: "tblOptions"
 };
 
 // Export the table names as a constant for easy access

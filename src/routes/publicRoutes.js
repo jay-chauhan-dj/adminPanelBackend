@@ -3,6 +3,7 @@ const LoginController = require('../controllers/LoginController');
 const RoutesController = require('../controllers/RoutesController');
 const PaymentRoutes = require('./privateRoutes/PaymentRoutes');
 const WhatsappController = require('../controllers/WhatsappController');
+const PaymentController = require('../controllers/PaymentController');
 const router = express.Router();
 
 /*********************************************************************************************
@@ -21,7 +22,7 @@ router.get('/verifyEmail/:token', LoginController.verifyEmail);
 router.get('/routes', RoutesController.getRoutes);
 
 // Payment routes
-router.use("/payment", PaymentRoutes);
+router.get("/payment", PaymentController.getPaymentDetails);
 
 // Whatsapp routes
 router.post("/whatsapp/inbound", WhatsappController.getMessage);

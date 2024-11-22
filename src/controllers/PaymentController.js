@@ -1,6 +1,7 @@
 const MySQL = require('../utils/db/Mysql'); // Import the MySQL utility for database operations
 const tables = require('../config/tables'); // Import table configurations
 const Logger = require('../utils/logs/Logger'); // Import the Logger utility for logging
+const PaymentService = require('../services/payment/PaymentService');
 
 /**
  * @class PaymentController
@@ -15,7 +16,20 @@ class PaymentController {
         logger.write("Url Details: " + JSON.stringify(req.originalUrl), "payments/payment"); // Log the error
         logger.write("Headers Details: " + JSON.stringify(req.rawHeaders), "payments/payment"); // Log the error
         logger.write("Payment Details: " + JSON.stringify(req.body), "payments/payment"); // Log the error
-        res.status(200).json({ message: 'Details logged successfully!' }); // Send an error response
+        res.status(200).json({ message: 'Details logged successfully!' }); // Send an success response
+    }
+
+    static async createPaymentLink(req, res) {
+        const payment = new PaymentService(true);
+        const data = req.body;
+        const linkConfig = {
+            amount: data.amount,
+            linkExpiryTime: data.linkExpiryTime,
+            linkPurpose: data.linkPurpose,
+            linkNotify: data.linkNotify,
+        };
+        const paymentLink = await payment.createPaymentLink(linkConfig, data.contactId, data.linkType);
+        res.status(200).json({ message: 'Details logged successfully!', data: paymentLink });
     }
 }
 

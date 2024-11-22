@@ -3,7 +3,7 @@ const router = express.Router();
 const PaymentController = require('../../controllers/PaymentController');
 
 // Money routes
-router.get("/payment", PaymentController.getPaymentDetails);
+router.post("/payment-link/create", PaymentController.createPaymentLink);
 
 // Export Router
 module.exports = router;
