@@ -50,7 +50,11 @@ class PaymentService {
                 "linkNotification": linkConfig.linkNotify,
                 "autoReminders": false,
                 "notes": {},
-                "meta": {}
+                "meta": {
+                    "notify_url": "https://www.dj-jay.in",
+                    "upi_intent": false,
+                    "return_url": "https://www.dj-jay.in"
+                }
             }
 
             // Create a payment link for the unique payment ID
