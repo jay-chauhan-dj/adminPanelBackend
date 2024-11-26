@@ -2,8 +2,9 @@ const CashFree = require('../../providers/payment/class-cashfree');
 const Logger = require('../../utils/logs/Logger');  // Import Logger class for logging purposes
 const MySQL = require('../../utils/db/Mysql');  // Import MySQL class for database operations
 const tables = require('../../config/tables');  // Import table configuration constants
-const { getOption, setOption, stringPad } = require('../../utils/functions');
+const { getOption, setOption, stringPad, date } = require('../../utils/functions');
 const WhatsappService = require('../WhatsappService');
+const Email = require('../../utils/mail/Mail');
 
 class PaymentService {
     constructor(sandbox = false) {
@@ -87,7 +88,20 @@ class PaymentService {
 
             const whatsapp = new WhatsappService();
             const templateId = await whatsapp.getTemplateIdByName('payment_link');
-            const response = await whatsapp.sendTemplateMessage(customerDetails.customer_phone, templateId, templateParams);
+            await whatsapp.sendTemplateMessage(customerDetails.customer_phone, templateId, templateParams);
+
+            const to = customerDetails.customer_email; // Get the recipient's email address from the request body
+
+            // Prepare the email template data from the request body
+            const templateData = {
+                name: customerDetails.customer_name,
+                linkPurpose: paymentLink.link_purpose,
+                linkAmount: paymentLink.link_amount.toString(),
+                linkExpiryTime: date("D M, Y H:i a", paymentLink.link_expiry_time),
+                linkUrl: paymentLink.link_url,
+            };
+            const email = new Email(); // Create a new instance of the Email utility
+            await email.sendEmailTemplate(5, templateData, to); // Send the email using the specified template and data
 
             return paymentLink;
         } catch (error) {

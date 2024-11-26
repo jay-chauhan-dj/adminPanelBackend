@@ -42,6 +42,34 @@ class MailController {
         }
     }
 
+    /**
+     * @function sendEmail
+     * @description Sends an email using the Email utility.
+     * @param {Object} req - The HTTP request object.
+     * @param {Object} res - The HTTP response object.
+     */
+    static async sendEmail(req, res) {
+        try {
+            const to = req.body.to; // Get the recipient's email address from the request body
+            const from = req.body.from; // Get the sender's email address from the request body
+
+            // Prepare the email template data from the request body
+            const templateData = {
+                name: req.body.name,
+                emailTitle: req.body.title,
+                message: req.body.content,
+                subject: req.body.subject,
+            };
+            const email = new Email(); // Create a new instance of the Email utility
+            await email.sendEmailTemplate(3, templateData, to, from); // Send the email using the specified template and data
+            res.status(200).json({ message: 'Email sent successfully!' }); // Send a success response
+        } catch (error) {
+            const logger = new Logger(); // Create a new instance of the Logger utility
+            logger.write("Error in sending email: " + error, "email/error"); // Log the error
+            res.status(500).json({ message: 'Oops! Something went wrong!' }); // Send an error response
+        }
+    }
+
     static async sendQuickReply(req, res) {
         try {
             const to = req.body.to; // Get the recipient's email address from the request body
@@ -188,7 +216,7 @@ class MailController {
         try {
             await db.connect(); // Connect to the database
 
-            const mailId  = req.body.id; // Get the mail ID from the request body
+            const mailId = req.body.id; // Get the mail ID from the request body
 
             await db.table(tables.TBL_MAILS)
                 .where("mailId", mailId) // Mark the email as read in the database

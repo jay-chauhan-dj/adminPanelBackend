@@ -8,7 +8,9 @@ const EmailRoutes = require('./privateRoutes/EmailRoutes');
 const WhatsappRoutes = require('./privateRoutes/WhatsappRoutes');
 const MoneyRoutes = require('./privateRoutes/MoneyRoutes');
 const PaymentRoutes = require('./privateRoutes/PaymentRoutes');
+const VerifyUserRoutes = require('./privateRoutes/VerifyUserRoutes');
 const EventRoutes = require('./privateRoutes/EventRoutes');
+const ContactRoutes = require('./privateRoutes/ContactRoutes');
 const Logger = require('../utils/logs/Logger');
 
 /*********************************************************************************************
@@ -41,6 +43,12 @@ router.use("/event", EventRoutes);
 
 // Payment routes
 router.use("/payment", PaymentRoutes);
+
+// 2FA routes
+router.use("/2fa", VerifyUserRoutes);
+
+// Contacts routes
+router.use("/contact", ContactRoutes);
 
 // Clean Logs
 router.post("/clearLogs", (req, res) => {

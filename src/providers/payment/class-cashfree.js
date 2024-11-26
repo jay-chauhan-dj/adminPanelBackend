@@ -43,6 +43,8 @@ class CashFree {
             // Log any setup errors
             this.logger.write("Something went wrong in setup: " + error, "payment/cashfree/error");
             return false;  // Setup failure due to error
+        } finally {
+            this.db.disconnect();
         }
     }
 
@@ -52,9 +54,9 @@ class CashFree {
 
         try {
             const request = {
-                "link_amount": linkConfig.linkAmount,
+                "link_amount": parseFloat(linkConfig.linkAmount),
                 "link_currency": linkConfig.currency,
-                "link_minimum_partial_amount": linkConfig.partialAmount,
+                "link_minimum_partial_amount": parseFloat(linkConfig.partialAmount),
                 "link_id": linkConfig.linkIdFormatted,
                 "link_partial_payments": linkConfig.partialPayments,
                 "customer_details": linkConfig.customerDetails,
@@ -66,7 +68,6 @@ class CashFree {
                 "link_meta": linkConfig.meta
             }
 
-            console.log(request);
             const response = await this.cf.PGCreateLink(this.apiVersion, request);
             this.logger.write("link created Successfully: " + JSON.stringify(response.data), "payment/cashfree/success");
             return response.data;
