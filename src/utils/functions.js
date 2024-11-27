@@ -53,6 +53,10 @@ const base64Encode = (data) => {
  * @example
  * const formattedDate = date('YYYY/MM/DD', '2023-11-22');
  * console.log(formattedDate); // Outputs: "2023/11/22"
+ * 
+ * @example
+ * const formattedDate = date('MMMM DD, YYYY', '2023-11-22');
+ * console.log(formattedDate); // Outputs: "November 22, 2023"
  */
 const date = (format = 'YYYY-MM-DD HH:mm:ss', dateInput = null) => {
     const now = dateInput ? new Date(dateInput) : new Date(); // Use provided date or current date
@@ -60,6 +64,13 @@ const date = (format = 'YYYY-MM-DD HH:mm:ss', dateInput = null) => {
     if (isNaN(now.getTime())) {
         throw new Error('Invalid date input'); // Check for invalid dates
     }
+
+    // Month names for formatting
+    const monthNamesFull = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    const monthNamesShort = monthNamesFull.map(name => name.slice(0, 3));
 
     // Extract date and time components
     const year = now.getFullYear();
@@ -77,6 +88,8 @@ const date = (format = 'YYYY-MM-DD HH:mm:ss', dateInput = null) => {
     const formatMap = {
         'YYYY': year,
         'YY': String(year).slice(-2),
+        'MMMM': monthNamesFull[month],
+        'MMM': monthNamesShort[month],
         'MM': String(month + 1).padStart(2, '0'),
         'M': month + 1,
         'DD': day,
@@ -90,11 +103,11 @@ const date = (format = 'YYYY-MM-DD HH:mm:ss', dateInput = null) => {
     // Replace placeholders in the format string
     let formattedDate = format;
     for (const [placeholder, value] of Object.entries(formatMap)) {
-        formattedDate = formattedDate.replace(placeholder, value);
+        formattedDate = formattedDate.replace(new RegExp(placeholder, 'g'), value);
     }
 
     return formattedDate;
-}
+};
 
 /**
  * Converts formatted text (markdown-like) into plain text.

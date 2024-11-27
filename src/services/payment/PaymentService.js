@@ -67,6 +67,7 @@ class PaymentService {
                 linkGateway: 1,
                 linkContactId: contactId,
                 linkUrl: paymentLink.link_url,
+                linkQr: paymentLink.link_qrcode,
                 linkPurpose: paymentLink.link_purpose,
                 linkAmount: paymentLink.link_amount,
                 linkStatus: '0',
@@ -97,7 +98,7 @@ class PaymentService {
                 name: customerDetails.customer_name,
                 linkPurpose: paymentLink.link_purpose,
                 linkAmount: paymentLink.link_amount.toString(),
-                linkExpiryTime: date("D M, Y H:i a", paymentLink.link_expiry_time),
+                linkExpiryTime: date("DD MMMM, YYYY HH:mm A", paymentLink.link_expiry_time),
                 linkUrl: paymentLink.link_url,
             };
             const email = new Email(); // Create a new instance of the Email utility

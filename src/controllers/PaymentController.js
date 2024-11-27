@@ -20,7 +20,7 @@ class PaymentController {
     }
 
     static async createPaymentLink(req, res) {
-        const payment = new PaymentService(true);
+        const payment = new PaymentService(false);
         const data = req.body;
         const linkConfig = {
             amount: data.amount,
