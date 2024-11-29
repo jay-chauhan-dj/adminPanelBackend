@@ -111,6 +111,25 @@ class PaymentService {
         }
     }
 
+    async handleWebhook(data) {
+        try {
+            switch (data.type) {
+                case 'PAYMENT_LINK_EVENT':
+                    const details = data.data;
+                    const linkConfig = {
+                        pgLinkId: details.cf_link_id,
+                        linkIdFormated: details.link_id,
+                        paidAmount: details.link_amount_paid,
+                        linkStatus: details.link_status,
+                        eventTime: data.event_time
+                    };
+                    return await this.#updatePaymentLinkStatus(linkConfig);
+            }
+        } catch (error) {
+            this.logger.write('Error handling webhook: ' + error, 'payment/error');
+            return false;
+        }
+    }
     async #generatePaymentId(linkType) {
         try {
             var linkNumber = await getOption('paymentLinkNumber');
@@ -122,6 +141,39 @@ class PaymentService {
             return paymentId;
         } catch (error) {
             this.logger.write('Error generating payment ID:' + error, 'payment/error');
+            return false;
+        }
+    }
+
+    async #updatePaymentLinkStatus(linkConfig) {
+        try {
+            await this.db.connect();
+            const linkStatus = JSON.parse(await getOption("cashfreeLinkStatusMap"))[linkConfig.linkStatus];
+
+            var updateDetails = {
+                linkStatus: linkStatus,
+            };
+            switch (linkConfig.linkStatus) {
+                case "PAID":
+                    updateDetails["linkPaidAt"] = date("YYYY-MM-DD HH:mm:ss", linkConfig.eventTime);
+                    break;
+                case "EXPIRED":
+                    updateDetails["linkExpiredAt"] = date("YYYY-MM-DD HH:mm:ss", linkConfig.eventTime);
+                    break;
+                case "CANCELLED":
+                    updateDetails["linkFailedAt"] = date("YYYY-MM-DD HH:mm:ss", linkConfig.eventTime);
+                    break;
+                case "PARTIALLY_PAID":
+                    updateDetails["linkFailedAt"] = date("YYYY-MM-DD HH:mm:ss", linkConfig.eventTime);
+                    break;
+            }
+
+            return await this.db.table(tables.TBL_PAYMENT_LINKS)
+                .where("linkPgId", linkConfig.pgLinkId)
+                .where("linkIdFormatted", linkConfig.linkIdFormated)
+                .update(updateDetails);
+        } catch (error) {
+            this.logger.write('Error updating link details: ' + error, 'payment/error');
             return false;
         }
     }
