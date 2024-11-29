@@ -22,7 +22,7 @@ router.get('/verifyEmail/:token', LoginController.verifyEmail);
 router.get('/routes', RoutesController.getRoutes);
 
 // Payment routes
-router.get("/payment", PaymentController.getPaymentDetails);
+router.post("/payment", PaymentController.getPaymentDetails);
 
 // Whatsapp routes
 router.post("/whatsapp/inbound", WhatsappController.getMessage);
