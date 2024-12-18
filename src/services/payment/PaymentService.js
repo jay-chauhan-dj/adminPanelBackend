@@ -1,4 +1,3 @@
-const CashFree = require('../../providers/payment/class-cashfree');
 const Logger = require('../../utils/logs/Logger');  // Import Logger class for logging purposes
 const MySQL = require('../../utils/db/Mysql');  // Import MySQL class for database operations
 const tables = require('../../config/tables');  // Import table configuration constants
@@ -10,7 +9,27 @@ class PaymentService {
     constructor(sandbox = false) {
         this.logger = new Logger();
         this.db = new MySQL();
-        this.cf = new CashFree(sandbox);
+        this.paymentGateway = null;
+        this.sandbox = sandbox;
+    }
+
+    async #setup() {
+        try {
+            // Retrieve the active payment gateway from the database or configuration
+            const activeGateway = await getOption('activePaymentGateway'); // Example: 'cashfree' or 'razorpay'
+
+            // Dynamically construct the file path and load the corresponding class
+            const gatewayClassPath = `../../providers/payment/class-${activeGateway}.js`;            
+            const GatewayClass = require(gatewayClassPath);
+
+            // Initialize the payment gateway class
+            this.paymentGateway = new GatewayClass(this.sandbox); // Example: use sandbox flag
+            
+            return true;
+        } catch (error) {
+            this.logger.write('Error initializing payment gateway: ' + JSON.stringify(error), 'payment/error');
+            return false;
+        }
     }
 
     async createPaymentLink(linkConfig, contactId, linkType) {
@@ -58,20 +77,21 @@ class PaymentService {
                 }
             }
 
+            await this.#setup();
             // Create a payment link for the unique payment ID
-            const paymentLink = await this.cf.createPaymentLink(request);
+            const paymentLink = await this.paymentGateway.createPaymentLink(request);
 
             const linkDetails = {
-                linkPgId: paymentLink.cf_link_id,
-                linkIdFormatted: paymentLink.link_id,
-                linkGateway: 1,
+                linkPgId: paymentLink.linkId,
+                linkIdFormatted: paymentLink.linkIdFormatted,
+                linkGateway: paymentLink.linkGateway,
                 linkContactId: contactId,
-                linkUrl: paymentLink.link_url,
-                linkQr: paymentLink.link_qrcode,
-                linkPurpose: paymentLink.link_purpose,
-                linkAmount: paymentLink.link_amount,
+                linkUrl: paymentLink.linkUrl,
+                linkQr: paymentLink.linkQr,
+                linkPurpose: paymentLink.linkPurpose,
+                linkAmount: paymentLink.linkAmount,
                 linkStatus: '0',
-                linkExpiry: paymentLink.link_expiry_time,
+                linkExpiry: linkConfig.linkExpiryTime,
                 linkNotification: linkConfig.linkNotify,
             };
 
@@ -80,29 +100,29 @@ class PaymentService {
 
             const templateParams = [
                 customerDetails.customer_name,
-                paymentLink.link_purpose,
-                paymentLink.link_amount.toString(),
-                paymentLink.link_expiry_time,
-                paymentLink.link_url,
-                paymentLink.link_url.split('/').pop()
+                paymentLink.linkPurpose,
+                (parseFloat(paymentLink.linkAmount) / 100).toString(),
+                "2 Hours",
+                paymentLink.linkUrl,
+                paymentLink.linkUrl.replace("https://rzp.io/", "")
             ];
 
             const whatsapp = new WhatsappService();
-            const templateId = await whatsapp.getTemplateIdByName('payment_link');
+            const templateId = await whatsapp.getTemplateIdByName('payment_link_razorpay');
             await whatsapp.sendTemplateMessage(customerDetails.customer_phone, templateId, templateParams);
 
-            const to = customerDetails.customer_email; // Get the recipient's email address from the request body
+            // const to = customerDetails.customer_email; // Get the recipient's email address from the request body
 
-            // Prepare the email template data from the request body
-            const templateData = {
-                name: customerDetails.customer_name,
-                linkPurpose: paymentLink.link_purpose,
-                linkAmount: paymentLink.link_amount.toString(),
-                linkExpiryTime: date("DD MMMM, YYYY HH:mm A", paymentLink.link_expiry_time),
-                linkUrl: paymentLink.link_url,
-            };
-            const email = new Email(); // Create a new instance of the Email utility
-            await email.sendEmailTemplate(5, templateData, to); // Send the email using the specified template and data
+            // // Prepare the email template data from the request body
+            // const templateData = {
+            //     name: customerDetails.customer_name,
+            //     linkPurpose: paymentLink.linkPurpose,
+            //     linkAmount: paymentLink.link_amount.toString(),
+            //     linkExpiryTime: date("DD MMMM, YYYY HH:mm A", linkConfig.linkExpiryTime),
+            //     linkUrl: paymentLink.linkUrl,
+            // };
+            // const email = new Email(); // Create a new instance of the Email utility
+            // await email.sendEmailTemplate(5, templateData, to); // Send the email using the specified template and data
 
             return paymentLink;
         } catch (error) {

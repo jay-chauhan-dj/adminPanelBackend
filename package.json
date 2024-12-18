@@ -23,6 +23,7 @@
     "node-cron": "^3.0.3",
     "nodemailer": "^6.9.14",
     "qrcode": "^1.5.4",
+    "razorpay": "^2.9.5",
     "speakeasy": "^2.0.0",
     "twilio": "^5.3.1"
   }
