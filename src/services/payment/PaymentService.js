@@ -197,6 +197,57 @@ class PaymentService {
             return false;
         }
     }
+
+    async createPayoutLink(linkConfig, contactId, linkType) {
+        try {
+            this.db.connect();
+            const paymentId = await this.#generatePaymentId(linkType);
+
+            const customer = await this.db.table(tables.TBL_CONTACTS + " c")
+                .join(tables.TBL_CONTACT_INFORMATIONS + " ci", "ci.contactId=c.contactId")
+                .select("c.contactFirstName", "c.contactLastName", "ci.contactInformationCategory", "ci.contactInformationValue")
+                .where("c.contactId", contactId)
+                .where("ci.contactInformationType", "0")
+                .where("ci.contactInformationIsActive", "1")
+                .rawWhere("ci.contactInformationCategory IN ('0', '2')")
+                .get();
+
+            const customerDetails = {
+                customer_name: customer[0].contactFirstName + " " + customer[0].contactLastName
+            };
+
+            customer.forEach(contactDetail => {
+                if (contactDetail.contactInformationCategory == 0) {
+                    customerDetails.customer_phone = contactDetail.contactInformationValue;
+                } else if (contactDetail.contactInformationCategory == 2) {
+                    customerDetails.customer_email = contactDetail.contactInformationValue;
+                }
+            });
+
+            const request = {
+                linkAmount: linkConfig.amount,
+                currency: "INR",
+                partialAmount: "0",
+                linkIdFormatted: paymentId,
+                customerDetails: customerDetails,
+                linkPurpose: linkConfig.linkPurpose,
+                description: linkConfig.description,
+                linkNotification: linkConfig.linkNotify,
+                autoReminders: false,
+                upiId: linkConfig.upiId,
+                bankDetails: linkConfig.bankDetails,
+                cardDetails: linkConfig.cardDetails,
+                notes: {}
+            }
+
+            await this.#setup();
+            const payoutLink = await this.paymentGateway.createPayoutLink(request, linkConfig.type);
+            return payoutLink;
+        } catch (error) {
+            this.logger.write('Error creating payout link:' + error, 'payout/error');
+            return false;
+        }
+    }
 }
 
 module.exports = PaymentService;

@@ -34,6 +34,22 @@ class PaymentController {
         const paymentLink = await payment.createPaymentLink(linkConfig, data.contactId, data.linkType);
         res.status(200).json({ message: 'Details logged successfully!', data: paymentLink });
     }
+
+    static async createPayoutLink(req, res) {
+        const payment = new PaymentService(true);
+        const data = req.body;
+        const linkConfig = {
+            amount: data.amount,
+            linkPurpose: data.linkPurpose,
+            type: data.type,
+            description: data.description,
+            upiId: data.upiId,
+            bankDetails: data.bankDetails,
+            cardDetails: data.cardDetails,
+        };
+        const paymentLink = await payment.createPayoutLink(linkConfig, data.contactId, data.linkType);
+        res.status(200).json({ message: 'Details logged successfully!', data: paymentLink });
+    }
 }
 
 module.exports = PaymentController; // Export the RoutesController class
