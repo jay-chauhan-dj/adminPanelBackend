@@ -1,7 +1,6 @@
-const MySQL = require('../utils/db/Mysql'); // Import the MySQL utility for database operations
-const tables = require('../config/tables'); // Import table configurations
 const Logger = require('../utils/logs/Logger'); // Import the Logger utility for logging
 const PaymentService = require('../services/payment/PaymentService');
+const { getOption } = require('../utils/functions');
 
 /**
  * @class PaymentController
@@ -32,7 +31,7 @@ class PaymentController {
             linkNotify: data.linkNotify,
         };
         const paymentLink = await payment.createPaymentLink(linkConfig, data.contactId, data.linkType);
-        res.status(200).json({ message: 'Details logged successfully!', data: paymentLink });
+        res.status(200).json({ success: true, message: 'Link created successfully!', data: paymentLink });
     }
 
     static async createPayoutLink(req, res) {
@@ -49,6 +48,11 @@ class PaymentController {
         };
         const paymentLink = await payment.createPayoutLink(linkConfig, data.contactId, data.linkType);
         res.status(200).json({ message: 'Details logged successfully!', data: paymentLink });
+    }
+
+    static async getPaymentTypes(req, res) {
+        const types = await getOption("paymentLinkIdPrefix");
+        res.status(200).json({ success: true, data: JSON.parse(types) });
     }
 }
 
