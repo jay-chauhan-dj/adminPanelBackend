@@ -86,13 +86,27 @@ class WhatsappController {
 
     static async getMessage(req, res) {
         try {
-            const whatsapp = new WhatsappService();
-            const response = await whatsapp.saveReceivedMessage(req.body);
+            const mode = req.query["hub.mode"];
+            const token = req.query["hub.verify_token"];
+            const challenge = req.query["hub.challenge"];
 
-            if (response) {
-                res.status(200).json({ message: 'Whatsapp message saved successfully!' });
+            // Check if token matches
+            if (mode === "subscribe" && token === "76ae62e5e0587463000ec1613174c82d39b6b34303e446e013547baa47011cb99308692840de5b06e3444c777fa767419f5287665b9869b49dbd87379b854a3b") {
+                const logger = new Logger(); // Create a new instance of the Logger utility
+                logger.write("Started.", "whatsapp/start");
+                var logObject = {
+                    method: req.method,
+                    url: req.url,
+                    headers: req.headers,
+                    body: req.body,
+                    params: req.params,
+                    query: req.query,
+                    timestamp: new Date(),
+                };
+                logger.write("Error in storing Whatsapp message: " + JSON.stringify(logObject), "whatsapp/success"); // Log the error
+                res.status(200).send(challenge); // Send back the challenge as plain text
             } else {
-                res.status(500).json({ message: 'Whatsapp message not saved successfully!' });
+                res.sendStatus(403); // Forbidden if verification fails
             }
         } catch (error) {
             const logger = new Logger(); // Create a new instance of the Logger utility
