@@ -120,6 +120,29 @@ class MailController {
                 };
                 await db.table(tables.TBL_MAILS).insert(insertDetails); // Insert email details into the database
             });
+            const emailCount = emails.length();
+            if (emailCount) {
+                const data = {
+                    blocks: [
+                        {
+                            type: "section",
+                            text: {
+                                type: "mrkdwn",
+                                text: "Hi Jay :wave:"
+                            }
+                        },
+                        {
+                            type: "section",
+                            text: {
+                                type: "mrkdwn",
+                                text: "You have " + emailCount + " new emails!"
+                            }
+                        }
+                    ]
+                }
+                const request = new HttpRequest("https://hooks.slack.com/services/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");
+                await request.postRequest("", data);
+            }
 
             res.status(200).json({ message: 'Email fetched successfully!' }); // Send a success response
         } catch (error) {
