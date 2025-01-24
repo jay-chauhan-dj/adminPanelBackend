@@ -3,6 +3,7 @@ const Email = require('../utils/mail/Mail'); // Import the Email utility for sen
 const Imap = require('../utils/mail/ImapClient'); // Import the ImapClient utility for fetching mails
 const MySQL = require('../utils/db/Mysql'); // Import the MySQL utility for database operations
 const tables = require('../config/tables'); // Import table configurations
+const HttpRequest = require('../utils/request/HttpRequest');
 const { date, convertToPlainText } = require('../utils/functions'); // Utility function to get the current date
 
 /**
