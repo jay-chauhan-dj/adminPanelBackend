@@ -122,6 +122,7 @@ class MailController {
                 await db.table(tables.TBL_MAILS).insert(insertDetails); // Insert email details into the database
             });
             const emailCount = emails.length;
+            if (emailCount > 0) {
                 const data = {
                     blocks: [
                         {
@@ -142,7 +143,7 @@ class MailController {
                 }
                 const request = new HttpRequest("https://hooks.slack.com/services/T0856KL0477");
                 await request.postRequest("/B08A1E5D60M/cGV6tzopNKe870oezFbfHEiW", data);
-
+            }
             res.status(200).json({ message: 'Email fetched successfully!' }); // Send a success response
         } catch (error) {
             const logger = new Logger(); // Create a new instance of the Logger utility
