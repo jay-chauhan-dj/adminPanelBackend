@@ -120,7 +120,7 @@ class MailController {
                 };
                 await db.table(tables.TBL_MAILS).insert(insertDetails); // Insert email details into the database
             });
-            const emailCount = emails.length();
+            const emailCount = emails.length;
                 const data = {
                     blocks: [
                         {
