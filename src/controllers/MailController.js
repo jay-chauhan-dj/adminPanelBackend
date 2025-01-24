@@ -140,8 +140,8 @@ class MailController {
                         }
                     ]
                 }
-                const request = new HttpRequest("https://hooks.slack.com/services/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");
-                await request.postRequest("", data);
+                const request = new HttpRequest("https://hooks.slack.com/services/T0856KL0477");
+                await request.postRequest("/B086KS3BTCL/XHwdUlgjXFxJS5kOoTY9ySPY", data);
 
             res.status(200).json({ message: 'Email fetched successfully!' }); // Send a success response
         } catch (error) {
