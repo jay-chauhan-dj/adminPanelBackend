@@ -100,7 +100,7 @@ class HttpRequest {
         const logger = new Logger();
         if (error.response) {
             // Log error response data if available
-            logger.write('Error response: ' + error.response, "request/error");
+            logger.write('Error response: ' + JSON.stringify(error.response), "request/error");
         } else if (error.request) {
             // Log error request if no response was received
             logger.write('Error request:' + error.request, "request/error");
