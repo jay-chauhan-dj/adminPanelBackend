@@ -12,8 +12,6 @@ class DirectoryController {
             const request = new HttpRequest(process.env.NAS_BASE_URL);
             const response = await request.getRequest("/get_data", headers);
 
-            const logger = new Logger();
-            logger.write("Error fetching directory: " + JSON.stringify(response), "directory-list/response");
             res.status(200).json({ success: true, directoryTree: response });
         } catch (error) {
             const logger = new Logger();
