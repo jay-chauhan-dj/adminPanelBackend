@@ -14,6 +14,7 @@ class DirectoryController {
 
             const logger = new Logger();
             logger.write("Error fetching directory: " + JSON.stringify(response), "directory-list/response");
+            console.log(response);
             res.status(200).json({ success: true, directoryTree: response });
         } catch (error) {
             const logger = new Logger();
