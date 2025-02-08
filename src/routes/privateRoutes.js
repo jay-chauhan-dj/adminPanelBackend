@@ -11,6 +11,7 @@ const PaymentRoutes = require('./privateRoutes/PaymentRoutes');
 const VerifyUserRoutes = require('./privateRoutes/VerifyUserRoutes');
 const EventRoutes = require('./privateRoutes/EventRoutes');
 const ContactRoutes = require('./privateRoutes/ContactRoutes');
+const DirectoryRoutes = require('./privateRoutes/DirectoryRoutes');
 const Logger = require('../utils/logs/Logger');
 
 /*********************************************************************************************
@@ -49,6 +50,9 @@ router.use("/2fa", VerifyUserRoutes);
 
 // Contacts routes
 router.use("/contact", ContactRoutes);
+
+// Directory routes
+router.use("/nas", DirectoryRoutes);
 
 // Clean Logs
 router.post("/clearLogs", (req, res) => {
