@@ -30,7 +30,8 @@ const tables = {
     TBL_PINCODE: "tblPincode",
     TBL_PAYMENT_GATEWAY: "tblPaymentGateway",
     TBL_PAYMENT_LINKS: "tblPaymentLinks",
-    TBL_OPTIONS: "tblOptions"
+    TBL_OPTIONS: "tblOptions",
+    TBL_FILE_ICONS: "tblFileIcons",
 };
 
 // Export the table names as a constant for easy access
