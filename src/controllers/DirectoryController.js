@@ -9,10 +9,11 @@ class DirectoryController {
         try {
             const headers = {
                 "Content-Type": "application/json",
-                "authorization": "Bearer " + process.env.NAS_AUTH_TOKEN
+                "authorization": process.env.NAS_AUTH_TOKEN
             };
             const request = new HttpRequest(process.env.NAS_BASE_URL);
-            const response = await request.getRequest("/get_data", headers);
+            const response = await request.postRequest("/fetchDirectoryTree", {}, headers);
+            
             const fileConfig = await DirectoryController.#getFileTypes();
             var nasData = [];
             if (fileConfig) {
@@ -26,11 +27,13 @@ class DirectoryController {
                 }
             } else {
                 res.status(500).json({ message: 'Oops! Something went wrong!' });
+                const logger = new Logger();
+                logger.write("Error fetching directory config: " + JSON.stringify(error), "directory-list/error");
+                res.status(500).json({ message: 'Oops! Something went wrong!' });
             }
 
             res.status(200).json({ success: true, directoryTree: nasData });
         } catch (error) {
-            console.log(error);
             const logger = new Logger();
             logger.write("Error fetching directory: " + JSON.stringify(error), "directory-list/error");
             res.status(500).json({ message: 'Oops! Something went wrong!' });
@@ -55,25 +58,27 @@ class DirectoryController {
     static #getFileIcon(typeOrExtension, fileConfig) {
         // Loop through the fileConfig array to find the corresponding icon for fileType or extension
         for (const type of fileConfig) {
-          // If it's a file type (folder or back), we match based on type
-          if (type.fileType === typeOrExtension) {
-            return { iconSvg: type.iconSvg, iconColorClass: type.iconColorClass };
-          }
-      
-          // If it's a file extension, match accordingly
-          if (type.fileExtensions && type.fileExtensions.includes(typeOrExtension)) {
-            return { iconSvg: type.iconSvg, iconColorClass: type.iconColorClass };
-          }
+            
+            // If it's a file type (folder or back), we match based on type
+            if (type.fileType === typeOrExtension) {
+                return { iconSvg: type.iconSvg, iconColorClass: type.iconColorClass };
+            }
+            
+            // If it's a file extension, match accordingly
+            if (type.fileExtensions && type.fileExtensions.includes(typeOrExtension)) {
+                return { iconSvg: type.iconSvg, iconColorClass: type.iconColorClass };
+            }
         }
-      
+
         return null; // Return null if no icon found
-      }
+    }
 
     // Recursive function to traverse and update the JSON structure
     static #updateJson(json, fileConfig) {
         json.children.forEach(item => {
             // If the item is a file (identified by the 'unknown' type), add the SVG icon
-            if (item.type === 'unknown' && item.name) {
+            if (item.type === 'file' && item.name) {
+                
                 const extension = item.name.split('.').pop().toLowerCase();
                 const icon = DirectoryController.#getFileIcon(extension, fileConfig);
                 if (icon) {
