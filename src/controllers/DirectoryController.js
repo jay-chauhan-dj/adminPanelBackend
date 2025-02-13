@@ -40,6 +40,86 @@ class DirectoryController {
         }
     }
 
+    static async getFile(req, res) {
+        try {
+            const headers = {
+                "Content-Type": "application/json",
+                "authorization": process.env.NAS_AUTH_TOKEN
+            };
+            const data = {
+                location: req.body.location
+            };
+            const request = new HttpRequest(process.env.NAS_BASE_URL);
+            const response = await request.postRequest("/getFile", data, headers);
+
+            res.status(200).json({ success: true, nasResponse: response });
+        } catch (error) {
+            const logger = new Logger();
+            logger.write("Error fetching directory: " + JSON.stringify(error), "directory-list/error");
+            res.status(500).json({ message: 'Oops! Something went wrong!' });
+        }
+    }
+
+    static async deleteFile(req, res) {
+        try {
+            const headers = {
+                "Content-Type": "application/json",
+                "authorization": process.env.NAS_AUTH_TOKEN
+            };
+            const data = {
+                location: req.body.location
+            };
+            const request = new HttpRequest(process.env.NAS_BASE_URL);
+            const response = await request.postRequest("/deleteFile", data, headers);
+
+            res.status(200).json({ success: true, nasResponse: response });
+        } catch (error) {
+            const logger = new Logger();
+            logger.write("Error fetching directory: " + JSON.stringify(error), "directory-list/error");
+            res.status(500).json({ message: 'Oops! Something went wrong!' });
+        }
+    }
+
+    static async deleteFolder(req, res) {
+        try {
+            const headers = {
+                "Content-Type": "application/json",
+                "authorization": process.env.NAS_AUTH_TOKEN
+            };
+            const data = {
+                location: req.body.location
+            };
+            const request = new HttpRequest(process.env.NAS_BASE_URL);
+            const response = await request.postRequest("/deleteFolder", data, headers);
+
+            res.status(200).json({ success: true, nasResponse: response });
+        } catch (error) {
+            const logger = new Logger();
+            logger.write("Error fetching directory: " + JSON.stringify(error), "directory-list/error");
+            res.status(500).json({ message: 'Oops! Something went wrong!' });
+        }
+    }
+
+    static async createFolder(req, res) {
+        try {
+            const headers = {
+                "Content-Type": "application/json",
+                "authorization": process.env.NAS_AUTH_TOKEN
+            };
+            const data = {
+                location: req.body.location
+            };
+            const request = new HttpRequest(process.env.NAS_BASE_URL);
+            const response = await request.postRequest("/createFolder", data, headers);
+
+            res.status(200).json({ success: true, nasResponse: response });
+        } catch (error) {
+            const logger = new Logger();
+            logger.write("Error fetching directory: " + JSON.stringify(error), "directory-list/error");
+            res.status(500).json({ message: 'Oops! Something went wrong!' });
+        }
+    }
+
     // function to fetch file types
     static async #getFileTypes() {
         try {
