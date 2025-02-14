@@ -12,7 +12,7 @@ const router = express.Router(); // Create an Express router instance.
 
 // Route to create a 2FA secret for a user.
 router.get("/get", DirectoryController.getDirectoryTree);
-router.get("/getFile", DirectoryController.getFile);
+router.post("/getFile", DirectoryController.getFile);
 router.post("/deleteFile", DirectoryController.deleteFile);
 router.post("/createFolder", DirectoryController.createFolder);
 router.post("/deleteFolder", DirectoryController.deleteFolder);
