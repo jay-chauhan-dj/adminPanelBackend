@@ -10,7 +10,7 @@ require('dotenv').config();
  */
 class Logger {
     constructor() {
-        this.rootDir = path.resolve(__dirname, process.env.LOG_ROOT_DIR || '../../log'); // Use relative path within projectss
+        this.rootDir = path.resolve(__dirname, process.env.LOG_DIR || '../../log'); // Use relative path within projectss
     }
 
     /**

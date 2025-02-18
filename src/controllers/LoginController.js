@@ -4,6 +4,7 @@ const tables = require('../config/tables'); // Import table configurations
 const crypto = require('crypto'); // Import the crypto module for generating secure OTP and hashes
 const Logger = require('../utils/logs/Logger'); // Import the Logger utility for logging
 const WhatsappService = require('../services/WhatsappService');
+const HttpRequest = require('../utils/request/HttpRequest');
 
 /**
  * @class LoginController
@@ -117,8 +118,41 @@ class LoginController {
                     // Mail
                     await email.sendEmailTemplate(1, templateData, user.userEmail);
                     // Whatsapp
-                    const templateId = await whatsapp.getTemplateIdByName('login_otp');
-                    await whatsapp.sendTemplateMessage("91" + user.userWhatsappNumber, templateId, [user.userFirstName + " " + user.userLastName, otp]);
+                    // const templateId = await whatsapp.getTemplateIdByName('login_otp');
+                    // await whatsapp.sendTemplateMessage("91" + user.userWhatsappNumber, templateId, [user.userFirstName + " " + user.userLastName, otp]);
+                    // Slack
+                    const data = {
+                        "blocks": [
+                            {
+                                "type": "section",
+                                "text": {
+                                    "type": "mrkdwn",
+                                    "text": "*Secure Login OTP Code*"
+                                }
+                            },
+                            {
+                                "type": "section",
+                                "text": {
+                                    "type": "mrkdwn",
+                                    "text": "Please use the One-Time Password (OTP) provided below to complete your login process."
+                                }
+                            },
+                            {
+                                "type": "section",
+                                "text": {
+                                    "type": "mrkdwn",
+                                    "text": "*Otp:*\n" + otp + "\n*Validity:*\nOtp is valid for 5 minutes only."
+                                },
+                                "accessory": {
+                                    "type": "image",
+                                    "image_url": "https://api.slack.com/img/blocks/bkb_template_images/approvalsNewDevice.png",
+                                    "alt_text": "login thumbnail"
+                                }
+                            }
+                        ]
+                    }
+                    const request = new HttpRequest("https://hooks.slack.com/services/T0856KL0477");
+                    await request.postRequest("/B08CT362QV7/PjW87801OpBcVQ1D5JcM166E", data);
 
                     // Insert OTP verification details into the database
                     const otpVerificationData = {
